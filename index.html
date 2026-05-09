@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiteVM DeFi - Swap, Bridge & Farm</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.11.1/dist/ethers.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%); 
+            color: #e6edf3; 
+            min-height: 100vh; 
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        /* Header */
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 20px 0;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 30px;
+        }
+        .logo { 
+            font-size: 28px; 
+            font-weight: bold; 
+            background: linear-gradient(90deg, #58a6ff, #a371f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .network-badge {
+            background: #238636;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        /* Wallet */
+        .wallet-section { 
+            background: #161b22; 
+            border: 1px solid #30363d; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .wallet-btn {
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .wallet-btn:hover { background: #2ea043; }
+        .wallet-address { 
+            font-family: monospace; 
+            color: #58a6ff;
+            font-size: 16px;
+        }
+        
+        /* Tabs */
+        .tabs { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap;
+        }
+        .tab { 
+            padding: 12px 24px; 
+            background: #161b22; 
+            border: 1px solid #30363d; 
+            border-radius: 8px; 
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        .tab:hover { border-color: #58a6ff; }
+        .tab.active { 
+            background: #58a6ff; 
+            border-color: #58a6ff; 
+            color: #0d1117;
+        }
+        
+        /* Cards */
+        .card { 
+            background: #161b22; 
+            border: 1px solid #30363d; 
+            border-radius: 12px; 
+            padding: 24px; 
+            margin-bottom: 20px;
+        }
+        .card h2 { 
+            color: #8b949e; 
+            font-size: 14px; 
+            text-transform: uppercase; 
+            margin-bottom: 20px;
+        }
+        
+        /* Forms */
+        .form-group { margin-bottom: 16px; }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            color: #8b949e;
+            font-size: 14px;
+        }
+        input, select { 
+            width: 100%; 
+            padding: 14px; 
+            background: #0d1117; 
+            border: 1px solid #30363d; 
+            border-radius: 8px; 
+            color: #e6edf3; 
+            font-size: 16px;
+        }
+        input:focus, select:focus { outline: none; border-color: #58a6ff; }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn:hover { background: #2ea043; }
+        .btn:disabled { background: #30363d; cursor: not-allowed; }
+        .btn-secondary { background: #6e40c9; }
+        .btn-secondary:hover { background: #8250df; }
+        
+        /* Status */
+        #status { 
+            padding: 16px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            display: none;
+        }
+        #status.success { background: #1a3d1a; color: #4ade80; display: block; }
+        #status.error { background: #3d1a1a; color: #f87171; display: block; }
+        #status.info { background: #1a2a3d; color: #58a6ff; display: block; }
+        
+        /* Token List */
+        .token-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .token-item {
+            background: #0d1117;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .token-item:hover { border-color: #58a6ff; }
+        .token-item.selected { border-color: #58a6ff; background: #1f2937; }
+        
+        /* Info boxes */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .info-box {
+            background: #0d1117;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .info-box .label { color: #8b949e; font-size: 12px; }
+        .info-box .value { color: #58a6ff; font-size: 18px; font-weight: bold; margin-top: 5px; }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #8b949e;
+            font-size: 14px;
+        }
+        
+        /* Hidden sections */
+        .section { display: none; }
+        .section.active { display: block; }
+        
+        /* Balance display */
+        .balance-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #58a6ff;
+        }
+        
+        /* Arrow */
+        .arrow {
+            text-align: center;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🚀 LiteVM DeFi</div>
+            <div class="network-badge">LiteVM Testnet (4441)</div>
+        </header>
+        
+        <div id="status"></div>
+        
+        <!-- Wallet Section -->
+        <div class="wallet-section">
+            <div>
+                <button class="wallet-btn" onclick="connectWallet()">Connect Wallet</button>
+            </div>
+            <div id="walletInfo" style="display: none;">
+                <span class="wallet-address" id="walletAddress"></span>
+            </div>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('swap')">💱 Swap</div>
+            <div class="tab" onclick="showTab('liquidity')">🌊 Liquidity</div>
+            <div class="tab" onclick="showTab('farm')">🌾 Farm</div>
+            <div class="tab" onclick="showTab('bridge')">🌉 Bridge</div>
+            <div class="tab" onclick="showTab('tokens')">🪙 Tokens</div>
+        </div>
+        
+        <!-- SWAP SECTION -->
+        <div id="swap" class="section active">
+            <div class="card">
+                <h2>Swap Tokens</h2>
+                <div class="form-group">
+                    <label>From</label>
+                    <input type="text" id="swapFromAmount" placeholder="0.0">
+                    <select id="swapFromToken">
+                        <option value="0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052">TKNA - Token A</option>
+                        <option value="0x8370CfDe29eF5b0565e27e0643583a4784325946">TKNB - Token B</option>
+                    </select>
+                </div>
+                <div class="arrow">⬇️</div>
+                <div class="form-group">
+                    <label>To</label>
+                    <select id="swapToToken">
+                        <option value="0x8370CfDe29eF5b0565e27e0643583a4784325946">TKNB - Token B</option>
+                        <option value="0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052">TKNA - Token A</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="swap()">Swap</button>
+            </div>
+            
+            <div class="card">
+                <h2>Contract Addresses</h2>
+                <div class="info-box">
+                    <div class="label">Router</div>
+                    <div class="value" style="font-size: 14px;">0x62Ec2dA79c0A27A3BE3cf85Ad40c590dAC7DA49D</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- LIQUIDITY SECTION -->
+        <div id="liquidity" class="section">
+            <div class="card">
+                <h2>Add Liquidity</h2>
+                <div class="form-group">
+                    <label>Token A Amount</label>
+                    <input type="text" id="liqAmountA" placeholder="0.0">
+                </div>
+                <div class="form-group">
+                    <label>Token B Amount</label>
+                    <input type="text" id="liqAmountB" placeholder="0.0">
+                </div>
+                <button class="btn" onclick="addLiquidity()">Add Liquidity</button>
+            </div>
+            
+            <div class="card">
+                <h2>Your LP Tokens</h2>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="label">LP Balance</div>
+                        <div class="value" id="lpBalance">-</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="label">Pool Reserves</div>
+                        <div class="value" id="poolReserves">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FARM SECTION -->
+        <div id="farm" class="section">
+            <div class="card">
+                <h2>Stake LP Tokens</h2>
+                <div class="form-group">
+                    <label>Amount to Stake</label>
+                    <input type="text" id="stakeAmount" placeholder="0.0">
+                </div>
+                <button class="btn btn-secondary" onclick="stake()">Stake</button>
+            </div>
+            
+            <div class="card">
+                <h2>Unstake & Claim</h2>
+                <div class="form-group">
+                    <label>Amount to Unstake</label>
+                    <input type="text" id="unstakeAmount" placeholder="0.0">
+                </div>
+                <button class="btn" onclick="unstake()">Unstake</button>
+                <button class="btn btn-secondary" onclick="claimRewards()">Claim Rewards Only</button>
+            </div>
+            
+            <div class="card">
+                <h2>Farm Info</h2>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="label">Your Staked</div>
+                        <div class="value" id="stakedAmount">-</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="label">Pending Rewards</div>
+                        <div class="value" id="pendingRewards">-</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="label">Pool Total Locked</div>
+                        <div class="value" id="totalLocked">-</div>
+                    </div>
+                </div>
+                <button class="btn" style="margin-top:15px" onclick="refreshFarmInfo()">🔄 Refresh</button>
+            </div>
+        </div>
+        
+        <!-- BRIDGE SECTION -->
+        <div id="bridge" class="section">
+            <div class="card">
+                <h2>Bridge Tokens</h2>
+                <div class="form-group">
+                    <label>Select Token</label>
+                    <select id="bridgeToken">
+                        <option value="0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052">TKNA - Token A</option>
+                        <option value="0x8370CfDe29eF5b0565e27e0643583a4784325946">TKNB - Token B</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount</label>
+                    <input type="text" id="bridgeAmount" placeholder="0.0">
+                </div>
+                <div class="form-group">
+                    <label>Destination Chain</label>
+                    <select id="destChain">
+                        <option value="1">Ethereum</option>
+                        <option value="56">BSC</option>
+                        <option value="137">Polygon</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Recipient Address (optional)</label>
+                    <input type="text" id="bridgeRecipient" placeholder="Your address">
+                </div>
+                <button class="btn" onclick="bridge()">Bridge</button>
+            </div>
+            
+            <div class="card">
+                <h2>Bridge Info</h2>
+                <div class="info-box">
+                    <div class="label">Bridge Contract</div>
+                    <div class="value" style="font-size:14px">0x9bd9e7f8cDb5139a9B5849Cad100CB8A5A5e17b6</div>
+                </div>
+                <div class="info-box" style="margin-top:10px">
+                    <div class="label">Fee</div>
+                    <div class="value">0.25%</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TOKENS SECTION -->
+        <div id="tokens" class="section">
+            <div class="card">
+                <h2>All Tokens</h2>
+                <div class="info-grid" id="tokenList">
+                    <!-- Token list will be populated -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Token Addresses</h2>
+                <div id="tokenAddresses"></div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>LiteVM DeFi - Built on LiteVM Testnet</p>
+            <p>Chain ID: 4441 | RPC: liteforge.rpc.caldera.xyz</p>
+        </footer>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            router: "0x62Ec2dA79c0A27A3BE3cf85Ad40c590dAC7DA49D",
+            factory: "0xfd0D259C10DAa3FE2dB315eE19E4A8C3b98cc32a",
+            pair: "0x4e7e5efdF721b92e7eb974E2f313fEdefc81Db03",
+            tokenA: "0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052",
+            tokenB: "0x8370CfDe29eF5b0565e27e0643583a4784325946",
+            farm: "0x47ac007000F24AD4758eaA6Fcd1dAC020143C16a",
+            rewardToken: "0x0E93a836722D5712C8cF4bB41076b1121bfC8FC4",
+            bridge: "0x9bd9e7f8cDb5139a9B5849Cad100CB8A5A5e17b6",
+            bridgeToken: "0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052",
+            pid: 0
+        };
+        
+        const TOKEN_LIST = [
+            { addr: "0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052", symbol: "TKNA", name: "Token A" },
+            { addr: "0x8370CfDe29eF5b0565e27e0643583a4784325946", symbol: "TKNB", name: "Token B" },
+            { addr: "0x0E93a836722D5712C8cF4bB41076b1121bfC8FC4", symbol: "REWARD", name: "Farm Reward" },
+            { addr: "0x4e7e5efdF721b92e7eb974E2f313fEdefc81Db03", symbol: "LP", name: "Liquidity Pool" }
+        ];
+        
+        let provider, signer, userAddress;
+        
+        const ERC20_ABI = [
+            "function approve(address, uint256) returns (bool)",
+            "function allowance(address, address) view returns (uint256)",
+            "function balanceOf(address) view returns (uint256)",
+            "function decimals() view returns (uint8)",
+            "function symbol() view returns (string)"
+        ];
+        
+        const ROUTER_ABI = [
+            "function addLiquidity(address, address, uint256, uint256, uint256, uint256, address, uint256)",
+            "function swapExactTokensForTokens(uint256, uint256, address[], address, uint256)"
+        ];
+        
+        const FARM_ABI = [
+            "function deposit(uint256, uint256)",
+            "function withdraw(uint256, uint256)",
+            "function pendingReward(uint256, address) view returns (uint256)",
+            "function userInfo(uint256, address) view returns (uint256, uint256)",
+            "function poolInfo(uint256) view returns (address, uint256, uint256, uint256, uint256)"
+        ];
+        
+        const BRIDGE_ABI = [
+            "function bridge(address, uint256, uint256, address)"
+        ];
+        
+        // Initialize
+        window.onload = function() {
+            displayTokenList();
+        };
+        
+        function displayTokenList() {
+            const tokenListEl = document.getElementById('tokenList');
+            const tokenAddrEl = document.getElementById('tokenAddresses');
+            
+            let html = '';
+            let addrHtml = '';
+            
+            TOKEN_LIST.forEach(token => {
+                html += `<div class="info-box"><div class="label">${token.symbol}</div><div class="value">${token.name}</div></div>`;
+                addrHtml += `<div class="info-box" style="margin-bottom:10px"><div class="label">${token.symbol}</div><div class="value" style="font-size:12px">${token.addr}</div></div>`;
+            });
+            
+            tokenListEl.innerHTML = html;
+            tokenAddrEl.innerHTML = addrHtml;
+        }
+        
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    // Check if already connected to correct network
+                    const network = await window.ethereum.request({ method: 'eth_chainId' });
+                    if (network !== '0x1159') { // 4441 in hex
+                        try {
+                            await window.ethereum.request({
+                                method: 'wallet_switchEthereumChain',
+                                params: [{ chainId: '0x1159' }], // 4441
+                            });
+                        } catch (switchError) {
+                            // Chain not added, add it
+                            if (switchError.code === 4902) {
+                                await window.ethereum.request({
+                                    method: 'wallet_addEthereumChain',
+                                    params: [{
+                                        chainId: '0x1159',
+                                        chainName: 'LiteVM Testnet',
+                                        nativeCurrency: { name: 'zkLTC', symbol: 'zkLTC', decimals: 18 },
+                                        rpcUrls: ['https://liteforge.rpc.caldera.xyz/infra-partner-http'],
+                                        blockExplorerUrls: ['https://liteforge.caldera.xyz'],
+                                    }],
+                                });
+                            }
+                        }
+                    }
+                    
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = await provider.getSigner();
+                    userAddress = await signer.getAddress();
+                    
+                    document.getElementById('walletAddress').textContent = userAddress.slice(0,6) + '...' + userAddress.slice(-4);
+                    document.getElementById('walletInfo').style.display = 'block';
+                    document.querySelector('.wallet-btn').textContent = 'Connected';
+                    
+                    showStatus('Wallet connected!', 'success');
+                    
+                    // Load balances
+                    await refreshAllBalances();
+                } catch (e) {
+                    showStatus('Error connecting: ' + e.message, 'error');
+                    console.error(e);
+                }
+            } else {
+                showStatus('Please install MetaMask!', 'error');
+            }
+        }
+        
+        async function refreshAllBalances() {
+            if (!userAddress) return;
+            
+            try {
+                // LP Balance
+                const pair = new ethers.Contract(CONFIG.pair, ERC20_ABI, provider);
+                const lpBal = await pair.balanceOf(userAddress);
+                document.getElementById('lpBalance').textContent = ethers.formatEther(lpBal);
+                
+                // Pool reserves
+                const reserves = await pair.getReserves();
+                document.getElementById('poolReserves').textContent = 
+                    ethers.formatEther(reserves[0]) + ' / ' + ethers.formatEther(reserves[1]);
+                
+                // Farm info
+                await refreshFarmInfo();
+            } catch (e) {
+                console.log('Error refreshing balances:', e);
+            }
+        }
+        
+        async function refreshFarmInfo() {
+            if (!userAddress) return;
+            
+            try {
+                const farm = new ethers.Contract(CONFIG.farm, FARM_ABI, provider);
+                const userInfo = await farm.userInfo(CONFIG.pid, userAddress);
+                const pending = await farm.pendingReward(CONFIG.pid, userAddress);
+                const poolInfo = await farm.poolInfo(CONFIG.pid);
+                
+                document.getElementById('stakedAmount').textContent = ethers.formatEther(userInfo[0]);
+                document.getElementById('pendingRewards').textContent = ethers.formatEther(pending);
+                document.getElementById('totalLocked').textContent = ethers.formatEther(poolInfo.totalLocked);
+            } catch (e) {
+                console.log('Error refreshing farm:', e);
+            }
+        }
+        
+        // Swap
+        async function swap() {
+            if (!signer) return showStatus('Connect wallet first!', 'error');
+            
+            try {
+                const amountIn = document.getElementById('swapFromAmount').value;
+                const fromToken = document.getElementById('swapFromToken').value;
+                const toToken = document.getElementById('swapToToken').value;
+                
+                if (!amountIn) return showStatus('Enter amount!', 'error');
+                
+                showStatus('Processing swap...', 'info');
+                
+                const token = new ethers.Contract(fromToken, ERC20_ABI, signer);
+                const decimals = await token.decimals();
+                const amount = ethers.parseUnits(amountIn, decimals);
+                
+                const allowance = await token.allowance(userAddress, CONFIG.router);
+                if (allowance < amount) {
+                    const tx = await token.approve(CONFIG.router, amount);
+                    await tx.wait();
+                }
+                
+                const router = new ethers.Contract(CONFIG.router, ROUTER_ABI, signer);
+                const tx = await router.swapExactTokensForTokens(
+                    amount, 0, [fromToken, toToken], userAddress, Math.floor(Date.now()/1000) + 3600
+                );
+                await tx.wait();
+                
+                showStatus('Swap successful!', 'success');
+                await refreshAllBalances();
+            } catch (e) {
+                showStatus('Swap failed: ' + e.message.slice(0, 100), 'error');
+            }
+        }
+        
+        // Add Liquidity
+        async function addLiquidity() {
+            if (!signer) return showStatus('Connect wallet first!', 'error');
+            
+            try {
+                const amountA = document.getElementById('liqAmountA').value;
+                const amountB = document.getElementById('liqAmountB').value;
+                
+                if (!amountA || !amountB) return showStatus('Enter both amounts!', 'error');
+                
+                showStatus('Adding liquidity...', 'info');
+                
+                const tokenA = new ethers.Contract(CONFIG.tokenA, ERC20_ABI, signer);
+                const tokenB = new ethers.Contract(CONFIG.tokenB, ERC20_ABI, signer);
+                const decimalsA = await tokenA.decimals();
+                const decimalsB = await tokenB.decimals();
+                
+                const amountADesired = ethers.parseUnits(amountA, decimalsA);
+                const amountBDesired = ethers.parseUnits(amountB, decimalsB);
+                
+                await (await tokenA.approve(CONFIG.router, amountADesired)).wait();
+                await (await tokenB.approve(CONFIG.router, amountBDesired)).wait();
+                
+                const router = new ethers.Contract(CONFIG.router, ROUTER_ABI, signer);
+                const tx = await router.addLiquidity(
+                    CONFIG.tokenA, CONFIG.tokenB, amountADesired, amountBDesired, 0, 0, userAddress, Math.floor(Date.now()/1000) + 3600
+                );
+                await tx.wait();
+                
+                showStatus('Liquidity added!', 'success');
+                await refreshAllBalances();
+            } catch (e) {
+                showStatus('Add liquidity failed: ' + e.message.slice(0, 100), 'error');
+            }
+        }
+        
+        // Stake
+        async function stake() {
+            if (!signer) return showStatus('Connect wallet first!', 'error');
+            
+            try {
+                const amount = document.getElementById('stakeAmount').value;
+                if (!amount) return showStatus('Enter amount!', 'error');
+                
+                showStatus('Staking...', 'info');
+                
+                const pair = new ethers.Contract(CONFIG.pair, ERC20_ABI, signer);
+                const decimals = await pair.decimals();
+                const amountWei = ethers.parseUnits(amount, decimals);
+                
+                const allowance = await pair.allowance(userAddress, CONFIG.farm);
+                if (allowance < amountWei) {
+                    const tx = await pair.approve(CONFIG.farm, amountWei);
+                    await tx.wait();
+                }
+                
+                const farm = new ethers.Contract(CONFIG.farm, FARM_ABI, signer);
+                const tx = await farm.deposit(CONFIG.pid, amountWei);
+                await tx.wait();
+                
+                showStatus('Staked!', 'success');
+                await refreshFarmInfo();
+            } catch (e) {
+                showStatus('Stake failed: ' + e.message.slice(0, 100), 'error');
+            }
+        }
+        
+        // Unstake
+        async function unstake() {
+            if (!signer) return showStatus('Connect wallet first!', 'error');
+            
+            try {
+                const amount = document.getElementById('unstakeAmount').value;
+                if (!amount) return showStatus('Enter amount!', 'error');
+                
+                showStatus('Unstaking...', 'info');
+                
+                const pair = new ethers.Contract(CONFIG.pair, ERC20_ABI, signer);
+                const decimals = await pair.decimals();
+                const amountWei = ethers.parseUnits(amount, decimals);
+                
+                const farm = new ethers.Contract(CONFIG.farm, FARM_ABI, signer);
+                const tx = await farm.withdraw(CONFIG.pid, amountWei);
+                await tx.wait();
+                
+                showStatus('Unstaked!', 'success');
+                await refreshFarmInfo();
+                await refreshAllBalances();
+            } catch (e) {
+                showStatus('Unstake failed: ' + e.message.slice(0, 100), 'error');
+            }
+        }
+        
+        // Claim Rewards
+        async function claimRewards() {
+            if (!signer) return showStatus('Connect wallet first!', 'error');
+            
+            try {
+                showStatus('Claiming rewards...', 'info');
+                
+                const farm = new ethers.Contract(CONFIG.farm, FARM_ABI, signer);
+                const tx = await farm.withdraw(CONFIG.pid, 0);
+                await tx.wait();
+                
+                showStatus('Rewards claimed!', 'success');
+                await refreshFarmInfo();
+            } catch (e) {
+                showStatus('Claim failed: ' + e.message.slice(0, 100), 'error');
+            }
+        }
+        
+        // Bridge
+        async function bridge() {
+            if (!signer) return showStatus('Connect wallet first!', 'error');
+            
+            try {
+                const amount = document.getElementById('bridgeAmount').value;
+                const token = document.getElementById('bridgeToken').value;
+                const destChain = document.getElementById('destChain').value;
+                const recipient = document.getElementById('bridgeRecipient').value || userAddress;
+                
+                if (!amount) return showStatus('Enter amount!', 'error');
+                
+                showStatus('Bridging...', 'info');
+                
+                const tokenContract = new ethers.Contract(token, ERC20_ABI, signer);
+                const decimals = await tokenContract.decimals();
+                const amountWei = ethers.parseUnits(amount, decimals);
+                
+                const allowance = await tokenContract.allowance(userAddress, CONFIG.bridge);
+                if (allowance < amountWei) {
+                    const tx = await tokenContract.approve(CONFIG.bridge, amountWei);
+                    await tx.wait();
+                }
+                
+                const bridgeContract = new ethers.Contract(CONFIG.bridge, BRIDGE_ABI, signer);
+                const tx = await bridgeContract.bridge(token, amountWei, destChain, recipient);
+                await tx.wait();
+                
+                showStatus('Bridge initiated!', 'success');
+            } catch (e) {
+                showStatus('Bridge failed: ' + e.message.slice(0, 100), 'error');
+            }
+        }
+        
+        // Tabs
+        function showTab(tabId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabId === 'farm') refreshFarmInfo();
+            if (tabId === 'liquidity') refreshAllBalances();
+        }
+        
+        // Status
+        function showStatus(msg, type) {
+            const el = document.getElementById('status');
+            el.textContent = msg;
+            el.className = type;
+        }
+    </script>
+</body>
+</html>
