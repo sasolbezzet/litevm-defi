@@ -299,7 +299,7 @@
         <div class="card">
             <h2>Contract Addresses</h2>
             <div class="info-box">
-                <div class="info-row"><span class="label">Router</span><div style="font-size: 12px;">0x62Ec2dA79c0A27A3BE3cf85Ad40c590dAC7DA49D</div></div>
+                <div class="info-row"><span class="label">Router</span><div style="font-size: 12px;">0x17ebD8797625D7062A611Aea0473315Aae2F1E6f</div></div>
                 <div class="info-row"><span class="label">Factory</span><div style="font-size: 12px;">0xfd0D259C10DAa3FE2dB315eE19E4A8C3b98cc32a</div></div>
                 <div class="info-row"><span class="label">LP Farm</span><div style="font-size: 12px;">0x47ac007000F24AD4758eaA6Fcd1dAC020143C16a</div></div>
             </div>
@@ -333,7 +333,8 @@
     <script>
         // Configuration
         const CONFIG = {
-            router: "0x62Ec2dA79c0A27A3BE3cf85Ad40c590dAC7DA49D",
+            WETH: "0x7ff130684E14FF810B8a97Ba9447FdFEB8e27CaE",
+            router: "0x17ebD8797625D7062A611Aea0473315Aae2F1E6f",
             factory: "0xfd0D259C10DAa3FE2dB315eE19E4A8C3b98cc32a",
             farm: "0x47ac007000F24AD4758eaA6Fcd1dAC020143C16a",
             chainId: 4441,
@@ -341,6 +342,8 @@
         };
         
         const TOKENS = {
+            "NATIVE": { symbol: "zkLTC", decimals: 18, name: "zkLTC" },
+            "0x0000000000000000000000000000000000000000": { symbol: "zkLTC", decimals: 18, name: "zkLTC" },
             "NATIVE": { symbol: "zkLTC", decimals: 18, name: "zkLTC" },
             "0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052": { symbol: "TKNA", decimals: 18 },
             "0x8370CfDe29eF5b0565e27e0643583a4784325946": { symbol: "TKNB", decimals: 18 },
