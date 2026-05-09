@@ -445,20 +445,35 @@
         
         async function updateBalances() {
             try {
-                if (!signer) return;
+                if (!signer || !userAddress) return;
+                
+                console.log("Updating balances for", userAddress);
                 
                 // Native balance
                 const nativeBal = await provider.getBalance(userAddress);
-                document.getElementById('bal-native').textContent = ethers.formatEther(nativeBal).slice(0, 8);
+                const nativeEl = document.getElementById('bal-native');
+                if (nativeEl) nativeEl.textContent = ethers.formatEther(nativeBal).slice(0, 8);
                 
                 // Token balances
-                for (const [addr, info] of Object.entries(TOKENS)) {
-                    if (addr === "NATIVE") continue;
-                    const token = new ethers.Contract(addr, ERC20_ABI, provider);
-                    const bal = await token.balanceOf(userAddress);
-                    const el = document.getElementById('bal-' + info.symbol.toLowerCase());
-                    if (el) {
-                        el.textContent = ethers.formatUnits(bal, info.decimals).slice(0, 8);
+                const tokenAddresses = [
+                    { addr: "0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052", symbol: "tkna" },
+                    { addr: "0x8370CfDe29eF5b0565e27e0643583a4784325946", symbol: "tknb" },
+                    { addr: "0xA92408f6dFfEb31d9Edc009b082e0f71f24c4db9", symbol: "usdc" },
+                    { addr: "0x809b462E49aABe96f1C98740EFb08E7E5D9D5479", symbol: "usdt" },
+                    { addr: "0xf30f1b5c1CeFf5a093544a28A52133A8EF6fba2A", symbol: "wbtc" },
+                    { addr: "0x7ff130684E14FF810B8a97Ba9447FdFEB8e27CaE", symbol: "weth" }
+                ];
+                
+                for (const t of tokenAddresses) {
+                    try {
+                        const token = new ethers.Contract(t.addr, ERC20_ABI, provider);
+                        const bal = await token.balanceOf(userAddress);
+                        const el = document.getElementById('bal-' + t.symbol);
+                        if (el) {
+                            el.textContent = ethers.formatUnits(bal, t.symbol === 'wbtc' ? 8 : 18).slice(0, 8);
+                        }
+                    } catch(e) {
+                        console.log('Error getting balance for', t.symbol, e.message);
                     }
                 }
             } catch (e) {
@@ -479,17 +494,22 @@
                 const toInfo = TOKENS[toToken];
                 
                 const amountIn = ethers.parseUnits(amount, fromInfo.decimals);
+                let path;
                 
-                if (fromToken === "NATIVE" || toToken === "NATIVE") {
-                    document.getElementById('toAmount').value = "Use quote...";
+                if (fromToken === "NATIVE" || fromToken === "0x0000000000000000000000000000000000000000") {
+                    path = [CONFIG.WETH, toToken];
+                } else if (toToken === "NATIVE" || toToken === "0x0000000000000000000000000000000000000000") {
+                    path = [fromToken, CONFIG.WETH];
                 } else {
-                    const path = [fromToken, toToken];
-                    const amounts = await router.getAmountsOut(amountIn, path);
-                    const output = amounts[1];
-                    document.getElementById('toAmount').value = ethers.formatUnits(output, toInfo.decimals).slice(0, 10);
+                    path = [fromToken, toToken];
                 }
+                
+                const amounts = await router.getAmountsOut(amountIn, path);
+                const output = amounts[amounts.length - 1];
+                document.getElementById('toAmount').value = ethers.formatUnits(output, toInfo.decimals).slice(0, 10);
             } catch (e) {
-                console.error(e);
+                console.error('updateSwap error:', e);
+                document.getElementById('toAmount').value = '-';
             }
         }
         
@@ -524,7 +544,7 @@
                     const path = [CONFIG.WETH, toToken];
                     const amounts = await router.getAmountsOut(amountIn, path);
                     const tx = await router.swapExactETHForTokens(
-                        amounts[1].mul(99).div(100),
+                        (amounts[1] * 99n) / 100n,
                         path,
                         userAddress,
                         deadline,
@@ -540,7 +560,7 @@
                     const amounts = await router.getAmountsOut(amountIn, path);
                     const tx = await router.swapExactTokensForETH(
                         amountIn,
-                        amounts[1].mul(99).div(100),
+                        (amounts[1] * 99n) / 100n,
                         path,
                         userAddress,
                         deadline
@@ -555,7 +575,7 @@
                     const amounts = await router.getAmountsOut(amountIn, path);
                     const tx = await router.swapExactTokensForTokens(
                         amountIn,
-                        amounts[1].mul(99).div(100),
+                        (amounts[1] * 99n) / 100n,
                         path,
                         userAddress,
                         deadline
