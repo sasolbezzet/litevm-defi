@@ -504,6 +504,10 @@
             const amount = document.getElementById('fromAmount').value;
             
             if (!amount) return;
+            if (fromToken === toToken) {
+                document.getElementById('swapStatus').innerHTML = '<span class="error">Same token selected</span>';
+                return;
+            }
             
             const statusEl = document.getElementById('swapStatus');
             statusEl.innerHTML = '<span style="color: #58a6ff;">Processing...</span>';
@@ -515,30 +519,29 @@
                 const amountIn = ethers.parseUnits(amount, fromInfo.decimals);
                 const deadline = Math.floor(Date.now() / 1000) + 3600;
                 
-                if (fromToken === "NATIVE") {
-                    // Swap ETH for tokens
-                    const path = [fromToken, toToken].filter(t => t !== "NATIVE");
+                if (fromToken === "NATIVE" || fromToken === "0x0000000000000000000000000000000000000000") {
+                    // Swap zkLTC for tokens (use WETH path)
+                    const path = [CONFIG.WETH, toToken];
                     const amounts = await router.getAmountsOut(amountIn, path);
                     const tx = await router.swapExactETHForTokens(
                         amounts[1].mul(99).div(100),
-                        [toToken],
+                        path,
                         userAddress,
                         deadline,
                         { value: amountIn }
                     );
                     await tx.wait();
-                } else if (toToken === "NATIVE") {
-                    // Swap tokens for ETH
+                } else if (toToken === "NATIVE" || toToken === "0x0000000000000000000000000000000000000000") {
+                    // Swap tokens for zkLTC (use WETH path)
                     const token = new ethers.Contract(fromToken, ERC20_ABI, signer);
                     await token.approve(CONFIG.router, amountIn);
-                    await token.approve(CONFIG.router, amountIn);
                     
-                    const path = [fromToken];
+                    const path = [fromToken, CONFIG.WETH];
                     const amounts = await router.getAmountsOut(amountIn, path);
                     const tx = await router.swapExactTokensForETH(
                         amountIn,
                         amounts[1].mul(99).div(100),
-                        [fromToken],
+                        path,
                         userAddress,
                         deadline
                     );
@@ -564,7 +567,7 @@
                 await updateBalances();
             } catch (e) {
                 console.error(e);
-                statusEl.innerHTML = '<span class="error">Error: ' + (e.reason || e.message).slice(0, 50) + '</span>';
+                statusEl.innerHTML = '<span class="error">Error: ' + (e.reason || e.message || e.toString()).slice(0, 80) + '</span>';
             }
         }
         
