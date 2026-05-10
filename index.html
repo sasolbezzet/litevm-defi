@@ -864,14 +864,15 @@ const FARM_ABI = [
                 const bridge = new ethers.Contract(bridgeAddr, BRIDGE_ABI, signer);
                 
                 if (token === '0x0000000000000000000000000000000000000000') {
-                    const tx = await bridge.bridgeETH(destChain, recipient, {
+                    const tx = await bridge.lockEth(destChain, recipient, {
                         value: ethers.parseEther(amount)
                     });
                     await tx.wait();
                     statusEl.innerHTML = '<span class="success">Bridge initiated!</span>';
                 } else {
                     const tokenContract = new ethers.Contract(token, ERC20_ABI, signer);
-                    await tokenContract.approve(bridgeAddr, ethers.parseEther(amount));
+                    const decimals = token === '0xA92408f6dFfEb31d9Edc009b082e0f71f24c4db9' || token === '0x809b462E49aABe96f1C98740EFb08E7E5D9D5479' ? 6 : 18;
+                    await tokenContract.approve(bridgeAddr, decimals === 6 ? ethers.parseUnits(amount, 6) : ethers.parseEther(amount));
                     const tx = await bridge.bridgeToken(token, ethers.parseEther(amount), destChain, recipient);
                     await tx.wait();
                     statusEl.innerHTML = '<span class="success">Bridge initiated!</span>';
