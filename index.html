@@ -434,15 +434,22 @@ const FARM_ABI = [
         }
         
         async function connectMetaMask() {
-            console.log("Connecting to MetaMask...");
             closeWalletModal();
             try {
-                console.log("window.ethereum available:", !!window.ethereum);
-                if (window.ethereum) {
-                    provider = new ethers.BrowserProvider(window.ethereum);
-                    await provider.send("eth_requestAccounts", []);
-                    signer = await provider.getSigner();
-                    userAddress = await signer.getAddress();
+                if (!window.ethereum) {
+                    alert("MetaMask not installed!");
+                    return;
+                }
+                
+                const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                if (accounts.length === 0) {
+                    alert("No accounts found");
+                    return;
+                }
+                
+                userAddress = accounts[0];
+                provider = new ethers.JsonRpcProvider("https://liteforge.rpc.caldera.xyz/infra-partner-http");
+                signer = await provider.getSigner();
                     
                     const network = await provider.getNetwork();
                     if (network.chainId !== 4441n) {
