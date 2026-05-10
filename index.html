@@ -497,9 +497,9 @@
                 let path;
                 
                 if (fromToken === "NATIVE" || fromToken === "0x0000000000000000000000000000000000000000") {
-                    path = [CONFIG.WETH, toToken];
+                    path = ["0x0000000000000000000000000000000000000000", toToken];
                 } else if (toToken === "NATIVE" || toToken === "0x0000000000000000000000000000000000000000") {
-                    path = [fromToken, CONFIG.WETH];
+                    path = [fromToken, "0x0000000000000000000000000000000000000000"];
                 } else {
                     path = [fromToken, toToken];
                 }
