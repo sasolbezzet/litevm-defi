@@ -484,6 +484,8 @@ const FARM_ABI = [
                 
                 alert("10. Updating interface...");
                 document.getElementById('connectBtn').textContent = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+                document.getElementById('connectBtn').style.background = '#238636';
+                document.getElementById('connectBtn').style.color = 'white';
                 document.getElementById('walletInfo').classList.remove('hidden');
                 document.getElementById('swapBtn').textContent = 'Swap';
                 document.getElementById('swapBtn').disabled = false;
@@ -580,7 +582,11 @@ const FARM_ABI = [
                 
                 const amounts = await router.getAmountsOut(amountIn, path);
                 const output = amounts[amounts.length - 1];
-                document.getElementById('toAmount').value = ethers.formatUnits(output, toInfo.decimals).slice(0, 10);
+                try {
+                    document.getElementById('toAmount').value = ethers.formatUnits(output, toInfo.decimals).slice(0, 12);
+                } catch(e) {
+                    document.getElementById('toAmount').value = output.toString();
+                }
             } catch (e) {
                 console.error('updateSwap error:', e);
                 document.getElementById('toAmount').value = '-';
