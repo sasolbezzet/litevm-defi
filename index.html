@@ -294,11 +294,22 @@ console.log('ethereum:', typeof window.ethereum);
                 
                 <div class="swap-box">
                     <div class="token-row">
-                        <select id="bridgeDirection" class="token-select" onchange="updateBridgeDirection()" style="display:none">
+                        <div style="margin-bottom:15px">
+            <button class="wallet-btn" onclick="switchToLiteVM()" style="margin-right:5px;background:#238636">🌐 LiteVM</button>
+            <button class="wallet-btn" onclick="switchToSepolia()" style="background:#627eea">🌐 Sepolia</button>
+        </div>
+        <div id="currentNetwork" style="margin-bottom:10px;color:#58a6ff;font-weight:bold"></div>
+        <select id="bridgeDirection" class="token-select" onchange="updateBridgeDirection()">
+            <option value="to-sepolia">zkLTC → ETH Sepolia</option>
+            <option value="from-sepolia">ETH Sepolia → zkLTC</option>
+        </select>
                             <option value="to-sepolia">zkLTC → ETH Sepolia</option>
                             <option value="from-sepolia">ETH Sepolia → zkLTC</option>
                         </select>
                         <select id="bridgeChain" class="token-select">
+            <option value="4441">LiteVM (zkLTC)</option>
+            <option value="11155111" selected>ETH Sepolia</option>
+        </select>
                             <option value="4441">LiteVM</option>
                             <option value="11155111" selected>ETH Sepolia</option>
                         </select>
