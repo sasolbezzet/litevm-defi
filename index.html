@@ -484,81 +484,44 @@ const FARM_ABI = [
         }
 
         async function connectWallet() {
-            closeWalletModal();
-            alert("1. Starting connection...");
+            console.log('[Wallet] Starting connection...');
             
             if (!window.ethereum) {
-                alert("ERROR: MetaMask not found! Please install MetaMask browser extension.");
+                alert('MetaMask not found!');
                 return;
             }
             
-            alert("2. MetaMask detected, requesting account...");
-            
             try {
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-                alert("3. Account access approved, getting account info...");
-                
-                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                console.log('[Wallet] Requesting accounts...');
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                console.log('[Wallet] Accounts:', accounts);
                 
                 if (!accounts || accounts.length === 0) {
-                    alert("ERROR: No account found. Please unlock MetaMask in browser settings.");
+                    alert('Please unlock MetaMask');
                     return;
                 }
                 
                 userAddress = accounts[0];
-                alert("4. Account: " + userAddress.substring(0, 10) + "...");
+                console.log('[Wallet] Address:', userAddress);
                 
-                alert("5. Setting up provider...");
                 provider = new ethers.BrowserProvider(window.ethereum);
-                
-                alert("6. Getting signer...");
                 signer = await provider.getSigner();
                 
-                alert("7. Checking network...");
-                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                alert("Current network: " + chainId);
-                
-                // Try to switch to LiteVM
-                if (chainId !== '0x1159') {
-                    alert("8. Switching to LiteVM network...");
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: '0x1159' }]
-                        });
-                    } catch(e) {
-                        alert("9. Adding LiteVM network...");
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [{
-                                chainId: '0x1159',
-                                chainName: 'LiteVM Testnet',
-                                nativeCurrency: { name: 'zkLTC', symbol: 'zkLTC', decimals: 18 },
-                                rpcUrls: ['https://liteforge.rpc.caldera.xyz/infra-partner-http'],
-                                blockExplorerUrls: ['https://liteforge.explorer.caldera.xyz']
-                            }]
-                        });
-                    }
-                }
-                
-                alert("10. Updating interface...");
+                // Update UI
                 document.getElementById('connectBtn').textContent = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
-                document.getElementById('connectBtn').style.background = '#238636';
-                document.getElementById('connectBtn').style.color = 'white';
                 document.getElementById('walletInfo').classList.remove('hidden');
-                document.getElementById('swapBtn').textContent = 'Swap';
                 document.getElementById('swapBtn').disabled = false;
-                document.getElementById('addLiquidityBtn').textContent = 'Add Liquidity';
                 document.getElementById('addLiquidityBtn').disabled = false;
                 
                 await updateBalances();
-                await updateBridgeBalances();
+                updateNetworkDisplay();
                 
-                alert("SUCCESS! Wallet connected: " + userAddress.substring(0, 14) + "...");
+                console.log('[Wallet] Connected!');
+                closeWalletModal();
                 
-            } catch (e) {
-                alert("ERROR: " + e.message);
-                console.error("Wallet error:", e);
+            } catch(e) {
+                console.error('[Wallet] Error:', e);
+                alert('Connection error: ' + e.message);
             }
         }
         
