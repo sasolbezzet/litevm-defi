@@ -434,8 +434,10 @@ const FARM_ABI = [
         }
         
         async function connectMetaMask() {
+            console.log("Connecting to MetaMask...");
             closeWalletModal();
             try {
+                console.log("window.ethereum available:", !!window.ethereum);
                 if (window.ethereum) {
                     provider = new ethers.BrowserProvider(window.ethereum);
                     await provider.send("eth_requestAccounts", []);
