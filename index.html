@@ -289,6 +289,7 @@
                         <div style="text-align: right;">
                             <div id="farmEarned">Earned: 0</div>
                             <button class="wallet-btn" style="padding: 8px 16px; margin-top: 8px;" onclick="farmDeposit()">Deposit</button>
+                            <button class="wallet-btn" style="padding: 8px 16px; margin-top: 8px;" onclick="farmWithdraw()">Withdraw</button>
                         </div>
                     </div>
                 </div>
@@ -374,7 +375,10 @@
         const FARM_ABI = [
             "function deposit(uint256, uint256)",
             "function withdraw(uint256, uint256)",
-            "function pendingReward(uint256, address) view returns (uint256)"
+            "function pendingReward(uint256, address) view returns (uint256)",
+            "function poolLength() view returns (uint256)",
+            "function poolInfo(uint256) view returns (address, uint256, uint256, uint256)",
+            "function userInfo(uint256, address) view returns (uint256, uint256)"
         ];
         
         function openWalletModal() {
@@ -636,6 +640,51 @@
             } catch (e) {
                 console.error(e);
                 statusEl.innerHTML = '<span class="error">Error: ' + (e.reason || e.message).slice(0, 50) + '</span>';
+            }
+        }
+        
+        // Farm functions
+        async function farmDeposit() {
+            if (!signer || !userAddress) {
+                alert('Please connect wallet first');
+                return;
+            }
+            
+            const lpTokenAddress = "0x4e7e5efdF721b92e7eb974E2f313fEdefc81Db03";
+            const amount = prompt('Enter LP amount to deposit:');
+            if (!amount) return;
+            
+            try {
+                const lpToken = new ethers.Contract(lpTokenAddress, ERC20_ABI, signer);
+                await lpToken.approve(CONFIG.farm, ethers.parseEther(amount));
+                
+                const farm = new ethers.Contract(CONFIG.farm, FARM_ABI, signer);
+                const tx = await farm.deposit(0, ethers.parseEther(amount));
+                await tx.wait();
+                
+                alert('Deposit successful!');
+            } catch(e) {
+                alert('Error: ' + (e.reason || e.message).slice(0, 50));
+            }
+        }
+        
+        async function farmWithdraw() {
+            if (!signer || !userAddress) {
+                alert('Please connect wallet first');
+                return;
+            }
+            
+            const amount = prompt('Enter LP amount to withdraw:');
+            if (!amount) return;
+            
+            try {
+                const farm = new ethers.Contract(CONFIG.farm, FARM_ABI, signer);
+                const tx = await farm.withdraw(0, ethers.parseEther(amount));
+                await tx.wait();
+                
+                alert('Withdraw successful!');
+            } catch(e) {
+                alert('Error: ' + (e.reason || e.message).slice(0, 50));
             }
         }
         
