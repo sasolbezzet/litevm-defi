@@ -541,7 +541,7 @@
                 
                 if (fromToken === "NATIVE" || fromToken === "0x0000000000000000000000000000000000000000") {
                     // Swap zkLTC for tokens (use WETH path)
-                    const path = [CONFIG.WETH, toToken];
+                    const path = ["0x0000000000000000000000000000000000000000", toToken];
                     const amounts = await router.getAmountsOut(amountIn, path);
                     const tx = await router.swapExactETHForTokens(
                         (amounts[1] * 99n) / 100n,
@@ -556,7 +556,7 @@
                     const token = new ethers.Contract(fromToken, ERC20_ABI, signer);
                     await token.approve(CONFIG.router, amountIn);
                     
-                    const path = [fromToken, CONFIG.WETH];
+                    const path = [fromToken, "0x0000000000000000000000000000000000000000"];
                     const amounts = await router.getAmountsOut(amountIn, path);
                     const tx = await router.swapExactTokensForETH(
                         amountIn,
