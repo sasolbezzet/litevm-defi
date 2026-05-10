@@ -435,32 +435,71 @@ const FARM_ABI = [
         
         async function connectMetaMask() {
             closeWalletModal();
+            
+            if (!window.ethereum) {
+                alert("MetaMask not installed!");
+                return;
+            }
+            
             try {
-                if (!window.ethereum) {
-                    alert("MetaMask not installed!");
-                    return;
-                }
+                // Request account access
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
                 
-                // Request accounts
-                const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-                if (accounts.length === 0) {
-                    alert("No accounts found. Please unlock MetaMask.");
+                // Get accounts
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                
+                if (!accounts || accounts.length === 0) {
+                    alert("No account found. Please unlock MetaMask and try again.");
                     return;
                 }
                 
                 userAddress = accounts[0];
                 
-                // Use browser provider (works with MetaMask)
+                // Setup ethers provider
                 provider = new ethers.BrowserProvider(window.ethereum);
                 signer = await provider.getSigner();
                 
-                // Update UI immediately
-                updateWalletUI();
-                updateBalances();
+                // Check and switch to correct chain
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                const targetChainId = '0x1159'; // 4441 in hex
+                
+                if (chainId !== targetChainId) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: targetChainId }]
+                        });
+                    } catch (switchError) {
+                        // Chain not added, try to add it
+                        if (switchError.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: targetChainId,
+                                    chainName: 'LiteVM Testnet',
+                                    nativeCurrency: { name: 'zkLTC', symbol: 'zkLTC', decimals: 18 },
+                                    rpcUrls: ['https://liteforge.rpc.caldera.xyz/infra-partner-http'],
+                                    blockExplorerUrls: ['https://liteforge.explorer.caldera.xyz']
+                                }]
+                            });
+                        }
+                    }
+                }
+                
+                // Update UI
+                document.getElementById('connectBtn').textContent = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+                document.getElementById('walletInfo').classList.remove('hidden');
+                document.getElementById('swapBtn').textContent = 'Swap';
+                document.getElementById('swapBtn').disabled = false;
+                document.getElementById('addLiquidityBtn').textContent = 'Add Liquidity';
+                document.getElementById('addLiquidityBtn').disabled = false;
+                
+                // Update balances
+                await updateBalances();
                 
             } catch (e) {
-                console.error("Wallet connection error:", e);
-                alert("Connection failed: " + e.message);
+                console.error("Wallet error:", e);
+                alert("Connection error: " + e.message);
             }
         }
         
