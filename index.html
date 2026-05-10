@@ -365,13 +365,13 @@ console.log('ethereum:', typeof window.ethereum);
         <div style="background:#161b22; border-radius:12px; padding:30px; max-width:400px; width:90%;">
             <h3 style="margin-bottom:20px;">Connect Wallet</h3>
             <div style="display:flex; flex-direction:column; gap:10px;">
-                <button onclick="connectMetaMask()" style="padding:16px; background:#21262d; border:1px solid #30363d; border-radius:8px; color:#e6edf3; cursor:pointer;">
+                <button onclick="doConnectWallet()" style="padding:16px; background:#21262d; border:1px solid #30363d; border-radius:8px; color:#e6edf3; cursor:pointer;">
                     MetaMask
                 </button>
-                <button onclick="connectWalletConnect()" style="padding:16px; background:#21262d; border:1px solid #30363d; border-radius:8px; color:#e6edf3; cursor:pointer; opacity:0.5;" disabled>
+                <button onclick="doConnectWalletConnect()" style="padding:16px; background:#21262d; border:1px solid #30363d; border-radius:8px; color:#e6edf3; cursor:pointer; opacity:0.5;" disabled>
                     WalletConnect (Coming Soon)
                 </button>
-                <button onclick="connectCoinbase()" style="padding:16px; background:#21262d; border:1px solid #30363d; border-radius:8px; color:#e6edf3; cursor:pointer; opacity:0.5;" disabled>
+                <button onclick="doConnectCoinbase()" style="padding:16px; background:#21262d; border:1px solid #30363d; border-radius:8px; color:#e6edf3; cursor:pointer; opacity:0.5;" disabled>
                     Coinbase Wallet (Coming Soon)
                 </button>
             </div>
