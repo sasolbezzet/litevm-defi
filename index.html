@@ -434,44 +434,62 @@ const FARM_ABI = [
         }
         
         async function connectMetaMask() {
+            console.log("[Wallet] Starting connection...");
             closeWalletModal();
             
+            // Debug: Check if MetaMask exists
+            console.log("[Wallet] window.ethereum:", typeof window.ethereum);
+            console.log("[Wallet] window.ethereum.isMetaMask:", window.ethereum?.isMetaMask);
+            
             if (!window.ethereum) {
-                alert("MetaMask not installed!");
+                alert("MetaMask not installed! Please install MetaMask.");
+                console.error("[Wallet] No ethereum provider found");
                 return;
             }
             
             try {
+                console.log("[Wallet] Requesting accounts...");
+                
                 // Request account access
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
+                console.log("[Wallet] Accounts requested");
                 
                 // Get accounts
                 const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                console.log("[Wallet] Accounts:", accounts);
                 
                 if (!accounts || accounts.length === 0) {
                     alert("No account found. Please unlock MetaMask and try again.");
+                    console.error("[Wallet] No accounts returned");
                     return;
                 }
                 
                 userAddress = accounts[0];
+                console.log("[Wallet] Connected address:", userAddress);
                 
                 // Setup ethers provider
+                console.log("[Wallet] Creating BrowserProvider...");
                 provider = new ethers.BrowserProvider(window.ethereum);
+                console.log("[Wallet] Getting signer...");
                 signer = await provider.getSigner();
+                console.log("[Wallet] Signer:", await signer.getAddress());
                 
-                // Check and switch to correct chain
+                // Check chain
                 const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                const targetChainId = '0x1159'; // 4441 in hex
+                console.log("[Wallet] Current chain:", chainId);
                 
+                const targetChainId = '0x1159';
                 if (chainId !== targetChainId) {
+                    console.log("[Wallet] Switching chain...");
                     try {
                         await window.ethereum.request({
                             method: 'wallet_switchEthereumChain',
                             params: [{ chainId: targetChainId }]
                         });
                     } catch (switchError) {
-                        // Chain not added, try to add it
+                        console.log("[Wallet] Chain switch error:", switchError.code);
                         if (switchError.code === 4902) {
+                            console.log("[Wallet] Adding chain...");
                             await window.ethereum.request({
                                 method: 'wallet_addEthereumChain',
                                 params: [{
@@ -497,8 +515,10 @@ const FARM_ABI = [
                 // Update balances
                 await updateBalances();
                 
+                console.log("[Wallet] Connection complete!");
+                
             } catch (e) {
-                console.error("Wallet error:", e);
+                console.error("[Wallet] Error:", e);
                 alert("Connection error: " + e.message);
             }
         }
