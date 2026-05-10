@@ -193,6 +193,7 @@
             <div class="tab active" onclick="showTab('swap')">Swap</div>
             <div class="tab" onclick="showTab('liquidity')">Liquidity</div>
             <div class="tab" onclick="showTab('farm')">Farm</div>
+            <div class="tab" onclick="showTab('bridge')">Bridge</div>
         </div>
         
         <!-- SWAP TAB -->
@@ -272,6 +273,33 @@
                     </div>
                     <button class="swap-btn" id="addLiquidityBtn" onclick="addLiquidity()" disabled>Connect Wallet First</button>
                     <div id="lpStatus"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- BRIDGE TAB -->
+        <div id="bridgeTab" class="hidden">
+            <div class="card">
+                <h2>Cross-Chain Bridge</h2>
+                <p style="color: #8b949e;">Bridge tokens between LiteVM and ETH Sepolia</p>
+                
+                <div class="swap-box">
+                    <div class="token-row">
+                        <select id="bridgeChain" class="token-select">
+                            <option value="11155111">ETH Sepolia</option>
+                        </select>
+                    </div>
+                    <div class="token-row">
+                        <select id="bridgeToken" class="token-select" onchange="updateBridgeAmount()">
+                            <option value="0x0000000000000000000000000000000000000000">Native ETH (zkLTC)</option>
+                            <option value="0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052">TKNA</option>
+                            <option value="0xA92408f6dFfEb31d9Edc009b082e0f71f24c4db9">USDC</option>
+                        </select>
+                        <input type="text" id="bridgeAmount" class="token-input" placeholder="Amount">
+                    </div>
+                    <input type="text" id="bridgeRecipient" class="token-input" placeholder="Recipient address on destination chain" style="margin: 10px 0;">
+                    <button class="swap-btn" id="bridgeBtn" onclick="doBridge()">Bridge to ETH Sepolia</button>
+                    <div id="bridgeStatus"></div>
                 </div>
             </div>
         </div>
