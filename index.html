@@ -400,7 +400,15 @@
             "function getAmountsOut(uint256, address[]) view returns (uint256[])"
         ];
         
-        const FARM_ABI = [
+        const BRIDGE_ABI = [
+    "function bridgeETH(uint256 destinationChain, address recipient) payable",
+    "function bridgeToken(address token, uint256 amount, uint256 destinationChain, address recipient)",
+    "function receiveFromChain(address token, uint256 amount, uint256 sourceChain, address recipient, bytes32 messageId)",
+    "function supportedChains(uint256) view returns (bool)",
+    "function whitelistedTokens(address) view returns (bool)"
+];
+
+const FARM_ABI = [
             "function deposit(uint256, uint256)",
             "function withdraw(uint256, uint256)",
             "function pendingReward(uint256, address) view returns (uint256)",
