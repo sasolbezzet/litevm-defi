@@ -429,7 +429,61 @@ const FARM_ABI = [
             document.getElementById('walletModal').style.display = 'none';
         }
         
-        async function connectMetaMask() {
+        async function switchToLiteVM() {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x1159' }]
+                });
+            } catch(e) {
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [{
+                        chainId: '0x1159',
+                        chainName: 'LiteVM Testnet',
+                        nativeCurrency: { name: 'zkLTC', symbol: 'zkLTC', decimals: 18 },
+                        rpcUrls: ['https://liteforge.rpc.caldera.xyz/infra-partner-http'],
+                        blockExplorerUrls: ['https://liteforge.explorer.caldera.xyz']
+                    }]
+                });
+            }
+            updateNetworkDisplay();
+        }
+
+        async function switchToSepolia() {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0xaa36a7' }]
+                });
+            } catch(e) {
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [{
+                        chainId: '0xaa36a7',
+                        chainName: 'ETH Sepolia',
+                        nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+                        rpcUrls: ['https://1rpc.io/sepolia'],
+                        blockExplorerUrls: ['https://sepolia.etherscan.io']
+                    }]
+                });
+            }
+            updateNetworkDisplay();
+        }
+
+        function updateNetworkDisplay() {
+            if (!window.ethereum) return;
+            window.ethereum.request({ method: 'eth_chainId' }).then(chain => {
+                const netEl = document.getElementById('currentNetwork');
+                if (netEl) {
+                    const name = chain === '0x1159' ? 'LiteVM Testnet' : 
+                                 chain === '0xaa36a7' ? 'ETH Sepolia' : 'Unknown';
+                    netEl.textContent = 'Current: ' + name + ' (' + chain + ')';
+                }
+            });
+        }
+
+        async function connectMetaMask() { {
             closeWalletModal();
             alert("1. Starting connection...");
             
@@ -498,6 +552,7 @@ const FARM_ABI = [
                 document.getElementById('addLiquidityBtn').disabled = false;
                 
                 await updateBalances();
+                await updateBridgeBalances();
                 
                 alert("SUCCESS! Wallet connected: " + userAddress.substring(0, 14) + "...");
                 
@@ -524,6 +579,30 @@ const FARM_ABI = [
             document.getElementById('addLiquidityBtn').disabled = false;
         }
         
+        async function updateBridgeBalances() {
+            if (!userAddress || !provider) return;
+            
+            try {
+                // Native ETH balance
+                const nativeBal = await provider.getBalance(userAddress);
+                document.getElementById('bridgeNativeBalance').textContent = 
+                    'Your ' + (document.getElementById('bridgeChain')?.value === '4441' ? 'zkLTC' : 'ETH') + ': ' + 
+                    Number(nativeBal / 1n).toLocaleString(undefined, {maximumFractionDigits: 6});
+                
+                // Token balances
+                const tokens = ['0xA92408f6dFfEb31d9Edc009b082e0f71f24c4db9', '0x809b462E49aABe96f1C98740EFb08E7E5D9D5479'];
+                const symbols = ['USDC', 'USDT'];
+                for (let i = 0; i < tokens.length; i++) {
+                    const tok = new ethers.Contract(tokens[i], ERC20_ABI, provider);
+                    const bal = await tok.balanceOf(userAddress);
+                    document.getElementById('bridge' + symbols[i] + 'Balance').textContent = 
+                        symbols[i] + ': ' + Number(bal / 1n).toLocaleString(undefined, {maximumFractionDigits: 2});
+                }
+            } catch(e) {
+                console.log('Balance error:', e);
+            }
+        }
+
         async function updateBalances() {
             try {
                 if (!signer || !userAddress) return;
