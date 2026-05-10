@@ -417,6 +417,14 @@ const FARM_ABI = [
             "function userInfo(uint256, address) view returns (uint256, uint256)"
         ];
         
+        const BRIDGE_ABI = [
+            "function bridgeETH(uint256 destinationChain, address recipient) payable",
+            "function bridgeToken(address token, uint256 amount, uint256 destinationChain, address recipient)",
+            "function receiveFromChain(address token, uint256 amount, uint256 sourceChain, address recipient, bytes32 messageId)",
+            "function supportedChains(uint256) view returns (bool)",
+            "function whitelistedTokens(address) view returns (bool)"
+        ];
+        
         function openWalletModal() {
             document.getElementById('walletModal').style.display = 'flex';
         }
@@ -724,6 +732,53 @@ const FARM_ABI = [
             }
         }
         
+        // Bridge function
+        async function doBridge() {
+            if (!signer || !userAddress) {
+                alert('Please connect wallet first');
+                return;
+            }
+            
+            const token = document.getElementById('bridgeToken').value;
+            const amount = document.getElementById('bridgeAmount').value;
+            const recipient = document.getElementById('bridgeRecipient').value;
+            const destChain = document.getElementById('bridgeChain').value;
+            
+            if (!amount || parseFloat(amount) <= 0) {
+                alert('Invalid amount');
+                return;
+            }
+            if (!recipient || !recipient.startsWith('0x')) {
+                alert('Invalid recipient address');
+                return;
+            }
+            
+            const statusEl = document.getElementById('bridgeStatus');
+            statusEl.innerHTML = 'Processing...';
+            
+            try {
+                const bridgeAddr = '0xF6140841F7eC77040c7De1271C61C095aF38D462';
+                const bridge = new ethers.Contract(bridgeAddr, BRIDGE_ABI, signer);
+                
+                if (token === '0x0000000000000000000000000000000000000000') {
+                    const tx = await bridge.bridgeETH(destChain, recipient, {
+                        value: ethers.parseEther(amount)
+                    });
+                    await tx.wait();
+                    statusEl.innerHTML = '<span class="success">Bridge initiated!</span>';
+                } else {
+                    const tokenContract = new ethers.Contract(token, ERC20_ABI, signer);
+                    await tokenContract.approve(bridgeAddr, ethers.parseEther(amount));
+                    const tx = await bridge.bridgeToken(token, ethers.parseEther(amount), destChain, recipient);
+                    await tx.wait();
+                    statusEl.innerHTML = '<span class="success">Bridge initiated!</span>';
+                }
+            } catch(e) {
+                console.error(e);
+                statusEl.innerHTML = '<span class="error">Error: ' + (e.reason || e.message).slice(0, 50) + '</span>';
+            }
+        }
+        
         function showTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
@@ -731,6 +786,7 @@ const FARM_ABI = [
             document.getElementById('swapTab').classList.add('hidden');
             document.getElementById('liquidityTab').classList.add('hidden');
             document.getElementById('farmTab').classList.add('hidden');
+            document.getElementById('bridgeTab').classList.add('hidden');
             
             document.getElementById(tab + 'Tab').classList.remove('hidden');
         }
