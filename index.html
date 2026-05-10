@@ -285,6 +285,10 @@
                 
                 <div class="swap-box">
                     <div class="token-row">
+                        <select id="bridgeDirection" class="token-select" onchange="updateBridgeDirection()">
+                            <option value="to-sepolia">zkLTC → ETH Sepolia</option>
+                            <option value="from-sepolia">ETH Sepolia → zkLTC</option>
+                        </select>
                         <select id="bridgeChain" class="token-select">
                             <option value="11155111">ETH Sepolia</option>
                         </select>
@@ -812,6 +816,18 @@ const FARM_ABI = [
             } catch(e) {
                 console.error(e);
                 statusEl.innerHTML = '<span class="error">Error: ' + (e.reason || e.message).slice(0, 50) + '</span>';
+            }
+        }
+        
+        function updateBridgeDirection() {
+            const dir = document.getElementById('bridgeDirection').value;
+            const chainSelect = document.getElementById('bridgeChain');
+            const btn = document.getElementById('bridgeBtn');
+            
+            if (dir === 'to-sepolia') {
+                btn.textContent = 'Bridge to ETH Sepolia';
+            } else {
+                btn.textContent = 'Bridge from ETH Sepolia';
             }
         }
         
