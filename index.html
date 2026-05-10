@@ -202,7 +202,7 @@
                 <div class="swap-box">
                     <div class="token-row">
                         <select id="fromToken" class="token-select" onchange="updateSwap()">
-                            <option value="NATIVE">zkLTC (Native)</option>
+                            <option value="0x45c1F708aE64532054c3284CF7aFde3948A539FF">NETH (Native ETH)</option>
                             <option value="0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052">TKNA - Token A</option>
                             <option value="0x8370CfDe29eF5b0565e27e0643583a4784325946">TKNB - Token B</option>
                             <option value="0xA92408f6dFfEb31d9Edc009b082e0f71f24c4db9">USDC</option>
@@ -299,7 +299,7 @@
         <div class="card">
             <h2>Contract Addresses</h2>
             <div class="info-box">
-                <div class="info-row"><span class="label">Router</span><div style="font-size: 12px;">0xD0C9452C04f43cbE83a61096127A956fdc379C69</div></div>
+                <div class="info-row"><span class="label">Router</span><div style="font-size: 12px;">0xb3b2eecE621A39342Dfd5d1F4E26CAaA619B9FB9</div></div>
                 <div class="info-row"><span class="label">Factory</span><div style="font-size: 12px;">0xfd0D259C10DAa3FE2dB315eE19E4A8C3b98cc32a</div></div>
                 <div class="info-row"><span class="label">LP Farm</span><div style="font-size: 12px;">0x47ac007000F24AD4758eaA6Fcd1dAC020143C16a</div></div>
             </div>
@@ -334,7 +334,7 @@
         // Configuration
         const CONFIG = {
             WETH: "0x7ff130684E14FF810B8a97Ba9447FdFEB8e27CaE",
-            router: "0xD0C9452C04f43cbE83a61096127A956fdc379C69",
+            router: "0xb3b2eecE621A39342Dfd5d1F4E26CAaA619B9FB9",
             factory: "0xfd0D259C10DAa3FE2dB315eE19E4A8C3b98cc32a",
             farm: "0x47ac007000F24AD4758eaA6Fcd1dAC020143C16a",
             chainId: 4441,
@@ -342,9 +342,9 @@
         };
         
         const TOKENS = {
-            "NATIVE": { symbol: "zkLTC", decimals: 18, name: "zkLTC" },
-            "0x0000000000000000000000000000000000000000": { symbol: "zkLTC", decimals: 18, name: "zkLTC" },
-            "NATIVE": { symbol: "zkLTC", decimals: 18, name: "zkLTC" },
+            "NETH": { symbol: "NETH", decimals: 18, name: "Native ETH" },
+            "0x45c1F708aE64532054c3284CF7aFde3948A539FF": { symbol: "NETH", decimals: 18, name: "Native ETH" },
+            "NETH": { symbol: "NETH", decimals: 18, name: "Native ETH" },
             "0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052": { symbol: "TKNA", decimals: 18 },
             "0x8370CfDe29eF5b0565e27e0643583a4784325946": { symbol: "TKNB", decimals: 18 },
             "0xA92408f6dFfEb31d9Edc009b082e0f71f24c4db9": { symbol: "USDC", decimals: 6 },
