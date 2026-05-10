@@ -441,44 +441,25 @@ const FARM_ABI = [
                     return;
                 }
                 
+                // Request accounts
                 const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
                 if (accounts.length === 0) {
-                    alert("No accounts found");
+                    alert("No accounts found. Please unlock MetaMask.");
                     return;
                 }
                 
                 userAddress = accounts[0];
-                provider = new ethers.JsonRpcProvider("https://liteforge.rpc.caldera.xyz/infra-partner-http");
+                
+                // Use browser provider (works with MetaMask)
+                provider = new ethers.BrowserProvider(window.ethereum);
                 signer = await provider.getSigner();
-                    
-                    const network = await provider.getNetwork();
-                    if (network.chainId !== 4441n) {
-                        try {
-                            await window.ethereum.request({
-                                method: 'wallet_switchEthereumChain',
-                                params: [{ chainId: '0x1159' }]
-                            });
-                        } catch (e) {
-                            await window.ethereum.request({
-                                method: 'wallet_addEthereumChain',
-                                params: [{
-                                    chainId: '0x1159',
-                                    chainName: 'LiteVM Testnet',
-                                    nativeCurrency: { name: 'zkLTC', symbol: 'zkLTC', decimals: 18 },
-                                    rpcUrls: ['https://liteforge.rpc.caldera.xyz/infra-partner-http'],
-                                    blockExplorerUrls: ['https://liteforge.explorer.caldera.xyz']
-                                }]
-                            });
-                        }
-                    }
-                    
-                    updateWalletUI();
-                    await updateBalances();
-                } else {
-                    alert("Please install MetaMask!");
-                }
+                
+                // Update UI immediately
+                updateWalletUI();
+                updateBalances();
+                
             } catch (e) {
-                console.error(e);
+                console.error("Wallet connection error:", e);
                 alert("Connection failed: " + e.message);
             }
         }
