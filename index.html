@@ -805,7 +805,13 @@
         
         const BRIDGE_ABI = [
             "function lockEth(uint256 destinationChain, address recipient) payable",
-            "function lockToken(address token, uint256 amount, uint256 destinationChain, address recipient)"
+            "function lockToken(address token, uint256 amount, uint256 destinationChain, address recipient)",
+            "function unlockEth(address recipient, uint256 amount, bytes32 lockId)",
+            "function selfRelay(bytes32 lockId)",
+            "function getPendingLocks(address) view returns (bytes32[])",
+            "function getLockInfo(uint256) view returns (address, address, uint256, uint256, address, uint256)",
+            "function getLockCount() view returns (uint256)",
+            "function processedMessages(bytes32) view returns (bool)"
         ];
         
         function showTab(tabName, el) {
@@ -1071,8 +1077,8 @@
             }
         }
         
-        const LITEVM_BRIDGE = "0xfcA5CB59fDFC0Cb15Ca1035FeE204DC916F7c70f";
-        const SEPOLIA_BRIDGE = "0xb9Fb801A5D1491E70A886800982CB80cdf98A174";
+        const LITEVM_BRIDGE = "0x78c397C8d84a5F0f05EE749fb08f629B0a7FB2e7";
+        const SEPOLIA_BRIDGE = "0x8bc25dB1feda8Fc5eB20d0117Ff1f965F2F4E29C";
         
         async function doBridge() {
             if (!signer || !userAddress) {
@@ -1109,16 +1115,21 @@
                 });
                 
                 await tx.wait();
-                statusEl.innerHTML = '<div class="status success">Bridge Initiated! Wait ~2-3 min, then switch to destination network and claim.</div>';
+                statusEl.innerHTML = '<div class="status processing">Menunggu confirm...</div>';
                 
-                // Auto-try to claim after a delay
+                // Wait for confirmation
+                await tx.wait();
+                
+                statusEl.innerHTML = '<div class="status success">Bridge Initiated! Sekarang switch network dan klaim.</div>';
+                
+                // Auto-relay after delay
                 setTimeout(async () => {
                     try {
-                        await autoClaim(destChain, recipient);
+                        await selfRelayFunds(destChain, recipient);
                     } catch(e) {
-                        console.log('Auto-claim not available, please claim manually');
+                        console.log('Auto-relay: switch manual dan klik Claim');
                     }
-                }, 3000);
+                }, 5000);
                 
             } catch(e) {
                 console.error(e);
