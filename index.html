@@ -680,7 +680,7 @@
                 </div>
                 
                 <button class="action-btn" id="bridgeBtn" onclick="doBridge()">Bridge Sekarang</button>
-                <button class="action-btn" id="claimBtn" onclick="doClaim()" style="margin-top:10px;background:#627eea">Klaim Funds (Setelah Bridge)</button>
+                <button class="action-btn" id="claimBtn" onclick="manualUnlock()" style="margin-top:10px;background:#627eea">Klaim Funds (Setelah Bridge)</button>
                 
                 <div style="margin-top:15px;padding:12px;background:#1a3a5c;border-radius:10px">
                     <div style="font-size:14px;font-weight:bold;margin-bottom:10px">🌉 Bridge Alternatif:</div>
@@ -1270,6 +1270,28 @@
         }
         
         // Claim function - for recipient to claim bridged funds
+        async function manualUnlock() {
+            if (!signer || !userAddress) {
+                alert('Connect wallet first');
+                return;
+            }
+            
+            const statusEl = document.getElementById('bridgeStatus');
+            statusEl.innerHTML = '<div class="status processing">Checking balance...</div>';
+            
+            try {
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                const currentChain = parseInt(chainId, 16);
+                
+                const bal = await provider.getBalance(userAddress);
+                const symbol = currentChain === 4441 ? 'zkLTC' : 'ETH';
+                statusEl.innerHTML = '<div class="status success">Balance: ' + (Number(bal)/1e18).toFixed(6) + ' ' + symbol + '</div>';
+                
+            } catch(e) {
+                statusEl.innerHTML = '<div class="status error">Error: ' + e.message.slice(0, 40) + '</div>';
+            }
+        }
+        
         async function doClaim() {
             if (!signer || !userAddress) {
                 alert('Please connect wallet first');
