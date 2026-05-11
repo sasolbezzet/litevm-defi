@@ -1268,21 +1268,25 @@
         async function updateFarmData() {
             if (!provider) return;
             try {
-                // Get real TVL from farm contract
                 const farm = new ethers.Contract(FARM, [
-                    "function totalDeposits() view returns (uint256)",
-                    "function rewardToken() view returns (address)"
+                    "function totalDeposits() view returns (uint256)"
                 ], provider);
                 
                 try {
                     const totalDeposits = await farm.totalDeposits();
                     const tvlNum = Number(totalDeposits / 1n) / 1e18;
                     document.getElementById('farmTVL1').textContent = '
+        
+        // Initialize on load
+        initApp().then(() => updateFarmData());
     </script>
 </body>
 </html>
  + tvlNum.toFixed(0);
                     document.getElementById('farmTVL2').textContent = '
+        
+        // Initialize on load
+        initApp().then(() => updateFarmData());
     </script>
 </body>
 </html>
