@@ -9,58 +9,47 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            /* Color System */
             --bg-primary: #0a0a0f;
             --bg-secondary: #12121a;
             --bg-tertiary: #1a1a24;
             --bg-card: #16161f;
             --bg-hover: #1e1e2a;
-            
-            /* Accent */
             --accent-primary: #6366f1;
             --accent-primary-hover: #818cf8;
             --accent-secondary: #22c55e;
             --accent-warning: #f59e0b;
             --accent-error: #ef4444;
             --accent-info: #3b82f6;
-            
             --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             --gradient-card: linear-gradient(180deg, rgba(99, 102, 241, 0.1) 0%, transparent 100%);
             --gradient-glow: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
-            
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
             --border-color: rgba(148, 163, 184, 0.1);
-            
             --spacing-xs: 4px;
             --spacing-sm: 8px;
             --spacing-md: 16px;
             --spacing-lg: 24px;
             --spacing-xl: 32px;
             --spacing-2xl: 48px;
-            
             --radius-sm: 6px;
             --radius-md: 12px;
             --radius-lg: 16px;
             --radius-xl: 24px;
-            
             --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
             --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.2);
-            
             --transition-fast: 150ms ease;
             --transition-base: 200ms ease;
             --transition-slow: 300ms ease;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
         body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 50%); pointer-events: none; z-index: -1; }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 var(--spacing-lg); }
         
-        /* Header */
         header { padding: var(--spacing-lg) 0; border-bottom: 1px solid var(--border-color); background: rgba(10, 10, 15, 0.8); backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 100; }
         .header-inner { display: flex; justify-content: space-between; align-items: center; }
         .logo { display: flex; align-items: center; gap: var(--spacing-md); }
@@ -79,7 +68,6 @@
         .wallet-address { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent-primary); }
         .wallet-balance { font-size: 14px; font-weight: 500; color: var(--accent-secondary); }
 
-        /* Tabs */
         .tabs { display: flex; gap: var(--spacing-sm); padding: var(--spacing-lg) 0; overflow-x: auto; scrollbar-width: none; }
         .tabs::-webkit-scrollbar { display: none; }
         .tab { display: flex; align-items: center; gap: var(--spacing-sm); padding: 12px 24px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: var(--transition-base); }
@@ -87,43 +75,25 @@
         .tab.active { background: var(--gradient-primary); border-color: transparent; color: white; box-shadow: var(--shadow-glow); }
         .tab-icon { font-size: 18px; }
 
-        /* Main */
         main { padding: var(--spacing-xl) 0 var(--spacing-2xl); }
         .content-grid { display: grid; grid-template-columns: 1fr; gap: var(--spacing-lg); }
         @media (min-width: 1024px) { .content-grid { grid-template-columns: 2fr 1fr; } }
 
-        /* Cards */
         .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--spacing-lg); transition: var(--transition-base); }
         .card:hover { border-color: rgba(99, 102, 241, 0.3); box-shadow: var(--shadow-lg); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg); }
         .card-title { font-size: 16px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* Forms */
         .form-group { margin-bottom: var(--spacing-md); }
         .form-label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: var(--spacing-sm); }
         .form-input { width: 100%; padding: 14px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-primary); font-size: 16px; transition: var(--transition-base); }
         .form-input:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
-        
-        /* Token Selector */
+
         .token-selector { position: relative; }
         .token-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; cursor: pointer; }
-        .token-option { padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-md); margin-bottom: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: var(--transition-base); }
-        .token-option:hover { background: var(--bg-hover); }
-        .token-option.selected { border: 2px solid var(--accent-primary); }
-        .token-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; }
-        .token-name { font-weight: 600; font-size: 14px; }
-        .token-address { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
         
-        /* Token Row */
-        .token-row { display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-md); background: var(--bg-tertiary); border-radius: var(--radius-md); margin-bottom: var(--spacing-sm); }
-        .token-icon-lg { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; }
-        .token-info { flex: 1; }
-        .token-symbol { font-weight: 600; font-size: 15px; }
-        .token-balance { font-size: 12px; color: var(--text-muted); }
-        
-        /* Dropdown */
         .dropdown { position: relative; }
-        .dropdown-toggle { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer; min-width: 180px; }
+        .dropdown-toggle { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer; min-width: 140px; }
         .dropdown-toggle:hover { border-color: var(--accent-primary); }
         .dropdown-menu { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-top: 4px; max-height: 250px; overflow-y: auto; z-index: 50; display: none; box-shadow: var(--shadow-lg); }
         .dropdown-menu.show { display: block; animation: slideIn 0.2s ease; }
@@ -131,8 +101,19 @@
         .dropdown-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; transition: var(--transition-base); }
         .dropdown-item:hover { background: var(--bg-hover); }
         .dropdown-item.selected { background: rgba(99, 102, 241, 0.1); border-left: 3px solid var(--accent-primary); }
+        
+        .native-badge { font-size: 10px; background: var(--accent-secondary); color: white; padding: 2px 6px; border-radius: 4px; margin-left: 4px; }
 
-        /* Buttons */
+        .token-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; }
+        .token-name { font-weight: 600; font-size: 14px; }
+        .token-address { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+        
+        .token-row { display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-md); background: var(--bg-tertiary); border-radius: var(--radius-md); margin-bottom: var(--spacing-sm); }
+        .token-icon-lg { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; }
+        .token-info { flex: 1; }
+        .token-symbol { font-weight: 600; font-size: 15px; }
+        .token-balance { font-size: 12px; color: var(--text-muted); }
+
         .action-btn { width: 100%; padding: 16px; background: var(--accent-primary); border: none; border-radius: var(--radius-md); color: white; font-size: 15px; font-weight: 600; cursor: pointer; transition: var(--transition-base); margin-top: var(--spacing-md); }
         .action-btn:hover { background: var(--accent-primary-hover); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4); }
         .action-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
@@ -140,35 +121,29 @@
         .action-btn.secondary:hover { background: var(--bg-hover); border-color: var(--accent-primary); }
         .action-btn.success { background: var(--accent-secondary); }
         
-        /* Stats */
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
         .stat-box { padding: var(--spacing-md); background: var(--gradient-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); text-align: center; }
         .stat-value { font-size: 20px; font-weight: 700; color: var(--accent-primary); margin-bottom: 4px; }
         .stat-label { font-size: 12px; color: var(--text-muted); }
 
-        /* Status */
         .status { padding: var(--spacing-md); border-radius: var(--radius-md); margin-bottom: var(--spacing-md); font-size: 14px; display: none; }
         .status.show { display: block; animation: slideIn 0.3s ease; }
         .status.success { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #4ade80; }
         .status.error { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; }
         .status.info { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; }
 
-        /* Section */
         .section { display: none; }
         .section.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Footer */
         footer { padding: var(--spacing-xl) 0; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-muted); font-size: 13px; }
         
-        /* Responsive */
         @media (max-width: 768px) {
             .header-inner { flex-direction: column; gap: var(--spacing-md); }
             .header-nav { width: 100%; justify-content: space-between; flex-wrap: wrap; }
             .content-grid { grid-template-columns: 1fr; }
             .stats-grid { grid-template-columns: 1fr; }
         }
-
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-secondary); }
         ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 4px; }
@@ -205,26 +180,11 @@
         <div id="status" class="status"></div>
 
         <nav class="tabs container">
-            <div class="tab active" onclick="showTab('swap')">
-                <span class="tab-icon">💱</span>
-                <span>Swap</span>
-            </div>
-            <div class="tab" onclick="showTab('liquidity')">
-                <span class="tab-icon">🌊</span>
-                <span>Liquidity</span>
-            </div>
-            <div class="tab" onclick="showTab('farm')">
-                <span class="tab-icon">🌾</span>
-                <span>Farm</span>
-            </div>
-            <div class="tab" onclick="showTab('bridge')">
-                <span class="tab-icon">🌉</span>
-                <span>Bridge</span>
-            </div>
-            <div class="tab" onclick="showTab('tokens')">
-                <span class="tab-icon">🪙</span>
-                <span>Tokens</span>
-            </div>
+            <div class="tab active" onclick="showTab('swap')"><span class="tab-icon">💱</span><span>Swap</span></div>
+            <div class="tab" onclick="showTab('liquidity')"><span class="tab-icon">🌊</span><span>Liquidity</span></div>
+            <div class="tab" onclick="showTab('farm')"><span class="tab-icon">🌾</span><span>Farm</span></div>
+            <div class="tab" onclick="showTab('bridge')"><span class="tab-icon">🌉</span><span>Bridge</span></div>
+            <div class="tab" onclick="showTab('tokens')"><span class="tab-icon">🪙</span><span>Tokens</span></div>
         </nav>
 
         <main class="container">
@@ -241,8 +201,8 @@
                                     <input type="number" class="form-input" id="swapFromAmount" placeholder="0.00" style="flex: 1; min-width: 120px;">
                                     <div class="dropdown">
                                         <div class="dropdown-toggle" onclick="toggleDropdown('swapFromDropdown')" id="swapFromTokenToggle">
-                                            <span class="token-icon" id="swapFromIcon" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">T</span>
-                                            <span id="swapFromLabel">TKNA</span>
+                                            <span class="token-icon" id="swapFromIcon" style="background: linear-gradient(135deg, #f7931a, #e67e00);">₿</span>
+                                            <span id="swapFromLabel">zkLTC</span>
                                             <i class="fas fa-chevron-down" style="margin-left: auto; font-size: 12px;"></i>
                                         </div>
                                         <div class="dropdown-menu" id="swapFromDropdown"></div>
@@ -260,8 +220,8 @@
                                     <input type="number" class="form-input" id="swapToAmount" placeholder="0.00" style="flex: 1; min-width: 120px;" readonly>
                                     <div class="dropdown">
                                         <div class="dropdown-toggle" onclick="toggleDropdown('swapToDropdown')" id="swapToTokenToggle">
-                                            <span class="token-icon" id="swapToIcon" style="background: linear-gradient(135deg, #22c55e, #16a34a);">T</span>
-                                            <span id="swapToLabel">TKNB</span>
+                                            <span class="token-icon" id="swapToIcon" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">T</span>
+                                            <span id="swapToLabel">TKNA</span>
                                             <i class="fas fa-chevron-down" style="margin-left: auto; font-size: 12px;"></i>
                                         </div>
                                         <div class="dropdown-menu" id="swapToDropdown"></div>
@@ -343,7 +303,7 @@
                                 <label class="form-label">Select LP Token to Stake</label>
                                 <div class="dropdown">
                                     <div class="dropdown-toggle" onclick="toggleDropdown('farmTokenDropdown')" id="farmTokenToggle">
-                                        <span class="token-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">L</span>
+                                        <span class="token-icon" style="background: linear-gradient(135deg, #ec4899, #be185d);">L</span>
                                         <span id="farmTokenLabel">TKNA-TKNB</span>
                                         <i class="fas fa-chevron-down" style="margin-left: auto; font-size: 12px;"></i>
                                     </div>
@@ -375,7 +335,7 @@
                             <div class="card-header"><h2 class="card-title">🌉 Cross-Chain Bridge</h2></div>
                             
                             <div class="stats-grid">
-                                <div class="stat-box"><div class="stat-value" id="bridgeBalance">0.00</div><div class="stat-label">Your Balance</div></div>
+                                <div class="stat-box"><div class="stat-value" id="bridgeBalance">0.00</div><div class="stat-label">zkLTC Balance</div></div>
                                 <div class="stat-box"><div class="stat-value" id="pendingBridge">0.00</div><div class="stat-label">Pending</div></div>
                             </div>
 
@@ -383,8 +343,8 @@
                                 <label class="form-label">Token</label>
                                 <div class="dropdown">
                                     <div class="dropdown-toggle" onclick="toggleDropdown('bridgeTokenDropdown')" id="bridgeTokenToggle">
-                                        <span class="token-icon" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">T</span>
-                                        <span id="bridgeTokenLabel">TKNA</span>
+                                        <span class="token-icon" style="background: linear-gradient(135deg, #f7931a, #e67e00);">₿</span>
+                                        <span id="bridgeTokenLabel">zkLTC</span>
                                         <i class="fas fa-chevron-down" style="margin-left: auto; font-size: 12px;"></i>
                                     </div>
                                     <div class="dropdown-menu" id="bridgeTokenDropdown"></div>
@@ -405,11 +365,6 @@
                             </div>
 
                             <button class="action-btn" onclick="doBridge()">Bridge Now</button>
-                            
-                            <div style="margin-top: 16px; padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-md);">
-                                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Alternative:</div>
-                                <a href="https://multyra.xyz" target="_blank" style="color: var(--accent-primary); font-size: 14px;">→ Use Multyra Bridge (Official)</a>
-                            </div>
                         </div>
                     </div>
 
@@ -427,7 +382,6 @@
                     </div>
                 </div>
 
-                <!-- Sidebar -->
                 <div>
                     <div class="card" style="position: sticky; top: 100px;">
                         <div class="card-header"><h2 class="card-title">📈 Market Stats</h2></div>
@@ -449,8 +403,16 @@
         </footer>
     </div>
     <script>
-        // Complete Token List with Real Addresses & Logos
+        // Complete Token List - WITHOUT LTC, WITH zkLTC
         const TOKENS = [
+            { 
+                symbol: 'zkLTC', 
+                name: 'zkLTC Native', 
+                address: null, // Native token - no address needed
+                isNative: true,
+                color1: '#f7931a', color2: '#e67e00',
+                logo: '₿'
+            },
             { 
                 symbol: 'TKNA', 
                 name: 'Token A', 
@@ -494,13 +456,6 @@
                 logo: '$'
             },
             { 
-                symbol: 'LTC', 
-                name: 'Litecoin', 
-                address: '0x7cF2A1d4B5E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0',
-                color1: '#bfbbbb', color2: '#8a8a8a',
-                logo: 'Ł'
-            },
-            { 
                 symbol: 'BTC', 
                 name: 'Bitcoin', 
                 address: '0x1B2A3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0',
@@ -542,7 +497,10 @@
 
         const ROUTER_ABI = [
             'function addLiquidity(address tokenA, address tokenB, uint256 amountADesired, uint256 amountBDesired, uint256 amountAMin, uint256 amountBMin, address to, uint256 deadline)',
+            'function swapExactETHForTokens(uint256 amountOutMin, address[] path, address to, uint256 deadline)',
+            'function swapTokensForExactETH(uint256 amountOut, uint256 amountInMax, address[] path, address to, uint256 deadline)',
             'function swapExactTokensForTokens(uint256 amountIn, uint256 amountOutMin, address[] path, address to, uint256 deadline)',
+            'function swapExactTokensForETH(uint256 amountIn, uint256 amountOutMin, address[] path, address to, uint256 deadline)',
             'function getAmountsOut(uint256 amountIn, address[] path) view returns (uint256[])'
         ];
 
@@ -554,25 +512,36 @@
             'function poolInfo(uint256 pid) view returns (address, uint256, uint256, uint256, uint256)'
         ];
 
-        // State
+        // State - FIX: Use JsonRpcProvider for LiteVM (no ENS support)
         let provider, signer, userAddress;
         let selectedTokens = {
-            swapFrom: TOKENS[0],
-            swapTo: TOKENS[1],
+            swapFrom: TOKENS[0], // zkLTC
+            swapTo: TOKENS[1],   // TKNA
             liqTokenA: null,
             liqTokenB: null,
             farmToken: TOKENS[8],
             bridgeToken: TOKENS[0]
         };
 
-        // Initialize
+        // Initialize - FIX: Use JsonRpcProvider to avoid ENS issues
         async function init() {
             renderTokenDropdowns();
             renderTokenList();
             renderContractList();
             
+            // FIX: Use JsonRpcProvider for LiteVM (no ENS)
+            try {
+                provider = new ethers.JsonRpcProvider(CONFIG.rpcUrl);
+            } catch(e) {
+                console.log('JsonRpcProvider failed, trying BrowserProvider');
+                if (typeof window.ethereum !== 'undefined') {
+                    provider = new ethers.BrowserProvider(window.ethereum, null, { 
+                        staticNetwork: true 
+                    });
+                }
+            }
+            
             if (typeof window.ethereum !== 'undefined') {
-                provider = new ethers.BrowserProvider(window.ethereum);
                 window.ethereum.on('accountsChanged', handleAccountsChanged);
                 window.ethereum.on('chainChanged', handleChainChanged);
                 await checkConnection();
@@ -589,8 +558,8 @@
                     <div class="dropdown-item" onclick="selectToken('${dropdownId}', '${token.symbol}')">
                         <div class="token-icon" style="background: linear-gradient(135deg, ${token.color1}, ${token.color2});">${token.logo}</div>
                         <div>
-                            <div class="token-name">${token.symbol}</div>
-                            <div class="token-address">${token.address.slice(0, 6)}...${token.address.slice(-4)}</div>
+                            <div class="token-name">${token.symbol}${token.isNative ? '<span class="native-badge">NATIVE</span>' : ''}</div>
+                            <div class="token-address">${token.isNative ? 'Native Token' : token.address.slice(0, 6) + '...' + token.address.slice(-4)}</div>
                         </div>
                     </div>
                 `).join('');
@@ -602,7 +571,7 @@
             const token = TOKENS.find(t => t.symbol === symbol);
             if (!token) return;
 
-            let toggleId, labelId, iconId, stateKey;
+            let toggleId, labelId, iconId;
             
             if (dropdownId === 'swapFromDropdown') {
                 toggleId = 'swapFromTokenToggle'; labelId = 'swapFromLabel'; iconId = 'swapFromIcon';
@@ -645,7 +614,6 @@
             document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('show'));
         }
 
-        // Close dropdowns when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.dropdown')) closeAllDropdowns();
         });
@@ -657,12 +625,12 @@
                 <div class="token-row">
                     <div class="token-icon-lg" style="background: linear-gradient(135deg, ${token.color1}, ${token.color2});">${token.logo}</div>
                     <div class="token-info">
-                        <div class="token-symbol">${token.symbol}</div>
+                        <div class="token-symbol">${token.symbol}${token.isNative ? '<span class="native-badge">NATIVE</span>' : ''}</div>
                         <div class="token-balance">${token.name}</div>
                     </div>
                     <div style="text-align: right;">
-                        <div class="token-symbol" id="bal_${token.symbol}">0.00</div>
-                        <div class="token-balance">Balance</div>
+                        <div class="token-symbol" id="bal_${token.symbol}">${token.isNative ? '-' : '0.00'}</div>
+                        <div class="token-balance">${token.isNative ? 'Native' : 'Balance'}</div>
                     </div>
                 </div>
             `).join('');
@@ -687,7 +655,7 @@
             `).join('');
         }
 
-        // Wallet Functions
+        // Wallet Functions - FIX: Proper handling without ENS
         async function connectWallet() {
             if (typeof window.ethereum === 'undefined') {
                 showStatus('Please install MetaMask!', 'error');
@@ -695,25 +663,38 @@
             }
             try {
                 await switchToNetwork();
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                userAddress = accounts[0];
-                signer = await provider.getSigner();
+                
+                // Use JsonRpcProvider with signer from window.ethereum
+                const web3Provider = new ethers.BrowserProvider(window.ethereum, null, {
+                    staticNetwork: true
+                });
+                signer = await web3Provider.getSigner();
+                userAddress = await signer.getAddress();
+                
+                // Use JsonRpcProvider for read operations
+                provider = new ethers.JsonRpcProvider(CONFIG.rpcUrl);
+                
                 updateWalletUI();
                 await refreshBalances();
                 showStatus('Wallet connected!', 'success');
             } catch(e) {
+                console.error('Connect error:', e);
                 showStatus('Failed: ' + e.message.slice(0, 50), 'error');
             }
         }
 
         async function checkConnection() {
             try {
-                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-                if (accounts.length > 0) {
-                    userAddress = accounts[0];
-                    signer = await provider.getSigner();
-                    updateWalletUI();
-                    await refreshBalances();
+                if (typeof window.ethereum !== 'undefined') {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        userAddress = accounts[0];
+                        provider = new ethers.JsonRpcProvider(CONFIG.rpcUrl);
+                        const web3Provider = new ethers.BrowserProvider(window.ethereum, null, { staticNetwork: true });
+                        signer = await web3Provider.getSigner();
+                        updateWalletUI();
+                        await refreshBalances();
+                    }
                 }
             } catch(e) { console.log('Not connected'); }
         }
@@ -769,11 +750,16 @@
         async function refreshBalances() {
             if (!userAddress) return;
             try {
+                // Native balance
                 const nativeBal = await provider.getBalance(userAddress);
-                document.getElementById('walletBalance').textContent = (Number(nativeBal) / 1e18).toFixed(4) + ' zkLTC';
-                document.getElementById('bridgeBalance').textContent = (Number(nativeBal) / 1e18).toFixed(4);
+                const nativeBalDisplay = (Number(nativeBal) / 1e18).toFixed(4);
+                document.getElementById('walletBalance').textContent = nativeBalDisplay + ' zkLTC';
+                document.getElementById('bridgeBalance').textContent = nativeBalDisplay;
+                document.getElementById('bal_zkLTC').textContent = nativeBalDisplay;
 
+                // Token balances
                 for (const token of TOKENS) {
+                    if (token.isNative) continue;
                     try {
                         const contract = new ethers.Contract(token.address, ERC20_ABI, provider);
                         const bal = await contract.balanceOf(userAddress);
@@ -798,7 +784,7 @@
             } catch(e) { console.error('Farm error:', e); }
         }
 
-        // Swap
+        // Swap - FIX: Handle native token (zkLTC) properly
         async function doSwap() {
             if (!signer) return showStatus('Connect wallet first!', 'error');
             if (!selectedTokens.swapFrom || !selectedTokens.swapTo) return showStatus('Select tokens!', 'error');
@@ -808,27 +794,51 @@
                 if (!amount || parseFloat(amount) <= 0) return showStatus('Enter amount!', 'error');
 
                 showStatus('Processing swap...', 'info');
-                const token = new ethers.Contract(selectedTokens.swapFrom.address, ERC20_ABI, signer);
+
                 const amountWei = ethers.parseEther(amount);
-                
-                const allowance = await token.allowance(userAddress, CONTRACTS.router);
-                if (allowance < amountWei) {
-                    const tx = await token.approve(CONTRACTS.router, amountWei);
-                    await tx.wait();
+                const router = new ethers.Contract(CONTRACTS.router, ROUTER_ABI, signer);
+                const deadline = Math.floor(Date.now() / 1000) + 3600;
+
+                let tx;
+
+                if (selectedTokens.swapFrom.isNative) {
+                    // Swap zkLTC for tokens
+                    const path = [CONTRACTS.weth, selectedTokens.swapTo.address];
+                    tx = await router.swapExactETHForTokens(0, path, userAddress, deadline, { value: amountWei });
+                } else if (selectedTokens.swapTo.isNative) {
+                    // Swap tokens for zkLTC
+                    const path = [selectedTokens.swapFrom.address, CONTRACTS.weth];
+                    
+                    // Approve first
+                    const token = new ethers.Contract(selectedTokens.swapFrom.address, ERC20_ABI, signer);
+                    const allowance = await token.allowance(userAddress, CONTRACTS.router);
+                    if (allowder < amountWei) {
+                        const approveTx = await token.approve(CONTRACTS.router, amountWei);
+                        await approveTx.wait();
+                    }
+                    
+                    tx = await router.swapExactTokensForETH(amountWei, 0, path, userAddress, deadline);
+                } else {
+                    // Token to Token swap
+                    const path = [selectedTokens.swapFrom.address, selectedTokens.swapTo.address];
+                    
+                    // Approve first
+                    const token = new ethers.Contract(selectedTokens.swapFrom.address, ERC20_ABI, signer);
+                    const allowance = await token.allowance(userAddress, CONTRACTS.router);
+                    if (allowder < amountWei) {
+                        const approveTx = await token.approve(CONTRACTS.router, amountWei);
+                        await approveTx.wait();
+                    }
+                    
+                    tx = await router.swapExactTokensForTokens(amountWei, 0, path, userAddress, deadline);
                 }
 
-                const router = new ethers.Contract(CONTRACTS.router, ROUTER_ABI, signer);
-                const tx = await router.swapExactTokensForTokens(
-                    amountWei, 0,
-                    [selectedTokens.swapFrom.address, selectedTokens.swapTo.address],
-                    userAddress,
-                    Math.floor(Date.now() / 1000) + 3600
-                );
                 await tx.wait();
                 showStatus('Swap completed!', 'success');
                 await refreshBalances();
             } catch(e) {
-                showStatus('Swap failed: ' + e.message.slice(0, 60), 'error');
+                console.error('Swap error:', e);
+                showStatus('Swap failed: ' + e.message.slice(0, 80), 'error');
             }
         }
 
@@ -836,6 +846,9 @@
         async function addLiquidity() {
             if (!signer) return showStatus('Connect wallet first!', 'error');
             if (!selectedTokens.liqTokenA || !selectedTokens.liqTokenB) return showStatus('Select both tokens!', 'error');
+            if (selectedTokens.liqTokenA.isNative || selectedTokens.liqTokenB.isNative) {
+                return showStatus('Native token (zkLTC) not supported for liquidity', 'error');
+            }
 
             try {
                 const amountA = document.getElementById('liqAmountA').value;
@@ -846,10 +859,11 @@
 
                 // Approve both tokens
                 for (const token of [selectedTokens.liqTokenA, selectedTokens.liqTokenB]) {
+                    if (token.isNative) continue;
                     const contract = new ethers.Contract(token.address, ERC20_ABI, signer);
                     const amount = token === selectedTokens.liqTokenA ? amountA : amountB;
                     const allowance = await contract.allowance(userAddress, CONTRACTS.router);
-                    if (allowance < ethers.parseEther(amount)) {
+                    if (allowder < ethers.parseEther(amount)) {
                         const tx = await contract.approve(CONTRACTS.router, ethers.parseEther(amount));
                         await tx.wait();
                     }
@@ -869,7 +883,8 @@
                 showStatus('Liquidity added!', 'success');
                 await refreshBalances();
             } catch(e) {
-                showStatus('Failed: ' + e.message.slice(0, 60), 'error');
+                console.error('Liq error:', e);
+                showStatus('Failed: ' + e.message.slice(0, 80), 'error');
             }
         }
 
@@ -900,7 +915,8 @@
                 showStatus('Staked!', 'success');
                 await refreshFarmData();
             } catch(e) {
-                showStatus('Failed: ' + e.message.slice(0, 60), 'error');
+                console.error('Stake error:', e);
+                showStatus('Failed: ' + e.message.slice(0, 80), 'error');
             }
         }
 
@@ -916,7 +932,7 @@
                 showStatus('Unstaked!', 'success');
                 await refreshFarmData();
             } catch(e) {
-                showStatus('Failed: ' + e.message.slice(0, 60), 'error');
+                showStatus('Failed: ' + e.message.slice(0, 80), 'error');
             }
         }
 
@@ -930,15 +946,14 @@
                 showStatus('Rewards claimed!', 'success');
                 await refreshFarmData();
             } catch(e) {
-                showStatus('Failed: ' + e.message.slice(0, 60), 'error');
+                showStatus('Failed: ' + e.message.slice(0, 80), 'error');
             }
         }
 
         // Bridge
         async function doBridge() {
             if (!signer) return showStatus('Connect wallet first!', 'error');
-            if (!selectedTokens.bridgeToken) return showStatus('Select token!', 'error');
-            showStatus('Use Multyra Bridge for cross-chain transfers', 'info');
+            showStatus('Cross-chain bridge coming soon!', 'info');
         }
 
         // UI
