@@ -3,1335 +3,1355 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiteForge DeFi - Swap, Bridge & Earn</title>
+    <title>LiteForge DeFi - Professional Trading Platform</title>
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.11.1/dist/ethers.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        
+        :root {
+            /* Color System - Professional Dark Theme */
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a24;
+            --bg-card: #16161f;
+            --bg-hover: #1e1e2a;
+            
+            /* Accent Colors */
+            --accent-primary: #6366f1;
+            --accent-primary-hover: #818cf8;
+            --accent-secondary: #22c55e;
+            --accent-warning: #f59e0b;
+            --accent-error: #ef4444;
+            --accent-info: #3b82f6;
+            
+            /* Gradient */
+            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --gradient-card: linear-gradient(180deg, rgba(99, 102, 241, 0.1) 0%, transparent 100%);
+            --gradient-glow: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            
+            /* Text */
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            /* Borders */
+            --border-color: rgba(148, 163, 184, 0.1);
+            --border-light: rgba(148, 163, 184, 0.05);
+            
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-2xl: 48px;
+            
+            /* Radius */
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.2);
+            
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-base: 200ms ease;
+            --transition-slow: 300ms ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
-            color: #e6edf3;
+            line-height: 1.6;
+            overflow-x: hidden;
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        /* Header */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            border-bottom: 1px solid #30363d;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #238636, #2ea043);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-        
-        .logo-text {
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #58a6ff, #2ea043);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .network-badge {
-            padding: 8px 16px;
-            background: #238636;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .wallet-btn {
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #238636, #2ea043);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .wallet-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(35, 134, 54, 0.4);
-        }
-        
-        /* Navigation */
-        nav {
-            display: flex;
-            gap: 8px;
-            margin: 30px 0;
-            background: #21262d;
-            padding: 6px;
-            border-radius: 16px;
-            width: fit-content;
-        }
-        
-        .nav-btn {
-            padding: 12px 28px;
-            background: transparent;
-            border: none;
-            color: #8b949e;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-        }
-        
-        .nav-btn.active {
-            background: linear-gradient(135deg, #238636, #2ea043);
-            color: white;
-        }
-        
-        .nav-btn:hover:not(.active) {
-            color: #e6edf3;
-            background: #30363d;
-        }
-        
-        /* Main Content */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-top: 30px;
-        }
-        
-        .card {
-            background: linear-gradient(145deg, #21262d, #161b22);
-            border: 1px solid #30363d;
-            border-radius: 24px;
-            padding: 30px;
-        }
-        
-        .card-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        /* Swap Card */
-        .swap-card {
-            grid-column: 1 / -1;
-            max-width: 500px;
-            margin: 0 auto;
-            width: 100%;
-        }
-        
-        .token-row {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 20px;
-            background: #0d1117;
-            border-radius: 16px;
-            margin-bottom: 10px;
-        }
-        
-        .token-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #30363d, #21262d);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-        
-        .token-info {
-            flex: 1;
-        }
-        
-        .token-symbol {
-            font-weight: 600;
-            font-size: 16px;
-        }
-        
-        .token-balance {
-            font-size: 13px;
-            color: #8b949e;
-        }
-        
-        .token-input {
-            width: 120px;
-            background: transparent;
-            border: none;
-            color: #e6edf3;
-            font-size: 20px;
-            text-align: right;
-            font-weight: 600;
-        }
-        
-        .token-input:focus {
-            outline: none;
-        }
-        
-        .token-select {
-            padding: 10px 16px;
-            background: #30363d;
-            border: 1px solid #484f58;
-            border-radius: 12px;
-            color: #e6edf3;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        
-        .swap-arrow {
-            display: flex;
-            justify-content: center;
-            margin: -5px 0;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .swap-arrow-btn {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #238636, #2ea043);
-            border: 4px solid #161b22;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-        }
-        
-        .action-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #238636, #2ea043);
-            border: none;
-            border-radius: 14px;
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .action-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(35, 134, 54, 0.4);
-        }
-        
-        .action-btn:disabled {
-            background: #30363d;
-            cursor: not-allowed;
-        }
-        
-        /* Bridge Card */
-        .bridge-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .bridge-btn-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .chain-btn {
-            flex: 1;
-            padding: 12px;
-            background: #30363d;
-            border: 2px solid transparent;
-            border-radius: 12px;
-            color: #e6edf3;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .chain-btn.active {
-            border-color: #238636;
-            background: rgba(35, 134, 54, 0.2);
-        }
-        
-        .balance-display {
-            padding: 15px;
-            background: #0d1117;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-        
-        .balance-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #21262d;
-        }
-        
-        .balance-row:last-child {
-            border-bottom: none;
-        }
-        
-        .balance-label {
-            color: #8b949e;
-        }
-        
-        .balance-value {
-            font-weight: 600;
-            color: #58a6ff;
-        }
-        
-        /* Farm Card */
-        .farm-pool {
-            background: #0d1117;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 15px;
-        }
-        
-        .farm-pool-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .farm-pool-name {
-            font-weight: 700;
-            font-size: 16px;
-        }
-        
-        .farm-apr {
-            background: linear-gradient(135deg, #f0883e, #d29922);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-        }
-        
-        .farm-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .farm-stat {
-            text-align: center;
-            padding: 12px;
-            background: #21262d;
-            border-radius: 10px;
-        }
-        
-        .farm-stat-label {
-            font-size: 12px;
-            color: #8b949e;
-            margin-bottom: 5px;
-        }
-        
-        .farm-stat-value {
-            font-weight: 700;
-            font-size: 16px;
-        }
-        
-        .farm-actions {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .farm-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .farm-btn.deposit {
-            background: linear-gradient(135deg, #238636, #2ea043);
-            color: white;
-        }
-        
-        .farm-btn.withdraw {
-            background: #30363d;
-            color: #e6edf3;
-        }
-        
-        /* Modal */
-        .modal-overlay {
-            display: none;
+
+        /* Background Pattern */
+        body::before {
+            content: '';
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
+                linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+        }
+
+        /* Header */
+        header {
+            padding: var(--spacing-lg) 0;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-md);
+            display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 22px;
+            box-shadow: var(--shadow-glow);
         }
-        
-        .modal {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 24px;
-            padding: 30px;
-            width: 90%;
-            max-width: 400px;
-        }
-        
-        .modal-title {
-            font-size: 20px;
+
+        .logo-text {
+            font-size: 22px;
             font-weight: 700;
-            margin-bottom: 20px;
-            text-align: center;
+            background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        
-        .wallet-option {
+
+        .logo-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .header-nav {
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 16px 20px;
-            background: #21262d;
-            border: 1px solid #30363d;
-            border-radius: 14px;
-            margin-bottom: 12px;
+            gap: var(--spacing-xl);
+        }
+
+        .network-selector {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition-base);
         }
-        
-        .wallet-option:hover {
-            border-color: #238636;
-            background: rgba(35, 134, 54, 0.1);
+
+        .network-selector:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
         }
-        
-        .wallet-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
+
+        .network-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-secondary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Wallet Button */
+        .wallet-btn {
+            padding: 10px 20px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: var(--radius-md);
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-base);
+            box-shadow: var(--shadow-md);
+        }
+
+        .wallet-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg), var(--shadow-glow);
+        }
+
+        .wallet-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .wallet-connected {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 20px;
+            gap: var(--spacing-md);
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
         }
-        
-        /* Status */
-        .status {
-            padding: 12px 16px;
-            border-radius: 10px;
-            margin-top: 15px;
-            font-size: 14px;
-            text-align: center;
-        }
-        
-        .status.success {
-            background: rgba(35, 134, 54, 0.2);
-            color: #3fb950;
-        }
-        
-        .status.error {
-            background: rgba(248, 81, 73, 0.2);
-            color: #f85149;
-        }
-        
-        .status.processing {
-            background: rgba(88, 166, 255, 0.2);
-            color: #58a6ff;
-        }
-        
-        /* Input */
-        .input-group {
-            margin-bottom: 15px;
-        }
-        
-        .input-label {
-            display: block;
+
+        .wallet-address {
+            font-family: 'JetBrains Mono', monospace;
             font-size: 13px;
-            color: #8b949e;
-            margin-bottom: 8px;
+            color: var(--accent-primary);
         }
-        
-        .input-field {
-            width: 100%;
-            padding: 14px 16px;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 12px;
-            color: #e6edf3;
-            font-size: 15px;
+
+        .wallet-balance {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-secondary);
         }
-        
-        .input-field:focus {
-            outline: none;
-            border-color: #238636;
+
+        /* Tabs Navigation */
+        .tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-lg) 0;
+            overflow-x: auto;
+            scrollbar-width: none;
         }
-        
-        /* Tab Content */
-        .tab-content {
+
+        .tabs::-webkit-scrollbar {
             display: none;
         }
-        
-        .tab-content.active {
-            display: block;
+
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: 12px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition-base);
         }
-        
+
+        .tab:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .tab.active {
+            background: var(--gradient-primary);
+            border-color: transparent;
+            color: white;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .tab-icon {
+            font-size: 18px;
+        }
+
+        /* Main Content */
+        main {
+            padding: var(--spacing-xl) 0 var(--spacing-2xl);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        @media (min-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            transition: var(--transition-base);
+        }
+
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 16px;
+            font-family: inherit;
+            transition: var(--transition-base);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        /* Token Row */
+        .token-row {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .token-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .token-info {
+            flex: 1;
+        }
+
+        .token-symbol {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .token-balance {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Action Button */
+        .action-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent-primary);
+            border: none;
+            border-radius: var(--radius-md);
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-base);
+            margin-top: var(--spacing-md);
+        }
+
+        .action-btn:hover {
+            background: var(--accent-primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .action-btn.secondary {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+        }
+
+        .action-btn.secondary:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .stat-box {
+            padding: var(--spacing-md);
+            background: var(--gradient-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Status Messages */
+        .status {
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-md);
+            font-size: 14px;
+            display: none;
+        }
+
+        .status.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+        }
+
+        .status.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+
+        .status.info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Section Visibility */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer */
+        footer {
+            padding: var(--spacing-xl) 0;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        footer a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
-            .main-grid {
+            .header-inner {
+                flex-direction: column;
+                gap: var(--spacing-md);
+            }
+
+            .header-nav {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .content-grid {
                 grid-template-columns: 1fr;
             }
-            
-            header {
-                flex-direction: column;
-                gap: 15px;
+
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
-            
-            .nav-btn {
-                padding: 10px 16px;
-                font-size: 14px;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
         }
     </style>
-    
-    <!-- Header -->
-    <header>
-        <div class="logo">
-            <div class="logo-icon">⚡</div>
-            <span class="logo-text">LiteForge</span>
-        </div>
-        <div class="header-right">
-            <div class="network-badge" id="networkBadge">LiteVM Testnet</div>
-            <button class="wallet-btn" id="connectBtn" onclick="openWalletModal()">Connect Wallet</button>
-        </div>
-    </header>
-    
-    <!-- Navigation -->
-    <nav>
-        <button class="nav-btn active" onclick="showTab('swap', this)">Swap</button>
-        <button class="nav-btn" onclick="showTab('liquidity', this)">Liquidity</button>
-        <button class="nav-btn" onclick="showTab('bridge', this)">Bridge</button>
-        <button class="nav-btn" onclick="showTab('farm', this)">Farm</button>
-    </nav>
-    
-    <!-- Main Content -->
-    <div class="main-grid">
-        
-        <!-- Swap Tab -->
-        <div id="swap" class="tab-content active">
-            <div class="card swap-card">
-                <div class="card-title">🔄 <span>Swap Tokens</span></div>
-                
-                <div class="token-row">
-                    <div class="token-icon">💰</div>
-                    <div class="token-info">
-                        <div class="token-symbol" id="fromSymbol">TKNA</div>
-                        <div class="token-balance" id="fromBalance">Balance: 0</div>
-                    </div>
-                    <select id="fromToken" class="token-select" onchange="updateSwap()">
-                        <option value="0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052">TKNA</option>
-                        <option value="0x8370CfDe29eF5b0565e27e0643583a4784325946">TKNB</option>
-                        <option value="0xA92408f6dFfEb31d9Edc009b082e0f71f24c4db9">USDC</option>
-                        <option value="0x809b462E49aABe96f1C98740EFb08E7E5D9D5479">USDT</option>
-                        <option value="0x7ff130684E14FF810B8a97Ba9447FdFEB8e27CaE">WETH</option>
-                        <option value="0xf30f1b5c1CeFf5a093544a28A52133A8EF6fba2A">WBTC</option>
-                    </select>
-                    <input type="number" id="fromAmount" class="token-input" placeholder="0.0" oninput="updateSwap()">
-                </div>
-                
-                <div class="swap-arrow">
-                    <div class="swap-arrow-btn" onclick="swapTokens()">↓</div>
-                </div>
-                
-                <div class="token-row">
-                    <div class="token-icon">💵</div>
-                    <div class="token-info">
-                        <div class="token-symbol" id="toSymbol">USDC</div>
-                        <div class="token-balance" id="toBalance">Balance: 0</div>
-                    </div>
-                    <select id="toToken" class="token-select" onchange="updateSwap()">
-                        <option value="0xA92408f6dFfEb31d9Edc009b082e0f71f24c4db9">USDC</option>
-                        <option value="0x809b462E49aABe96f1C98740EFb08E7E5D9D5479">USDT</option>
-                        <option value="0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052">TKNA</option>
-                        <option value="0x8370CfDe29eF5b0565e27e0643583a4784325946">TKNB</option>
-                        <option value="0x7ff130684E14FF810B8a97Ba9447FdFEB8e27CaE">WETH</option>
-                        <option value="0xf30f1b5c1CeFf5a093544a28A52133A8EF6fba2A">WBTC</option>
-                    </select>
-                    <input type="text" id="toAmount" class="token-input" placeholder="0.0" readonly>
-                </div>
-                
-                <button class="action-btn" id="swapBtn" onclick="doSwap()" disabled>Connect Wallet First</button>
-                
-                <div id="swapStatus"></div>
-            </div>
-        </div>
-        
-        <!-- Liquidity Tab -->
-        <div id="liquidity" class="tab-content">
-            <div class="card">
-                <div class="card-title">💧 <span>Add Liquidity</span></div>
-                
-                <div class="input-group">
-                    <label class="input-label">Token A</label>
-                    <select id="tokenA" class="token-select" style="width:100%">
-                        <option value="0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052">TKNA</option>
-                        <option value="0x8370CfDe29eF5b0565e27e0643583a4784325946">TKNB</option>
-                        <option value="0xA92408f6dFfEb31d9Edc009b082e0f71f24c4db9">USDC</option>
-                        <option value="0x809b462E49aABe96f1C98740EFb08E7E5D9D5479">USDT</option>
-                    </select>
-                </div>
-                
-                <div class="input-group">
-                    <label class="input-label">Amount A</label>
-                    <input type="number" id="amountA" class="input-field" placeholder="0.0">
-                </div>
-                
-                <div class="input-group">
-                    <label class="input-label">Token B</label>
-                    <select id="tokenB" class="token-select" style="width:100%">
-                        <option value="0xA92408f6dFfEb31d9Edc009b082e0f71f24c4db9">USDC</option>
-                        <option value="0x809b462E49aABe96f1C98740EFb08E7E5D9D5479">USDT</option>
-                        <option value="0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052">TKNA</option>
-                        <option value="0x8370CfDe29eF5b0565e27e0643583a4784325946">TKNB</option>
-                    </select>
-                </div>
-                
-                <div class="input-group">
-                    <label class="input-label">Amount B</label>
-                    <input type="number" id="amountB" class="input-field" placeholder="0.0">
-                </div>
-                
-                <button class="action-btn" id="addLiquidityBtn" onclick="addLiquidity()" disabled>Add Liquidity</button>
-                
-                <div id="liquidityStatus"></div>
-            </div>
-        </div>
-        
-        <!-- Bridge Tab -->
-        <div id="bridge" class="tab-content">
-            <div class="card">
-                <div class="card-title">🌉 <span>Cross-Chain Bridge</span></div>
-                
-                <!-- Network Switch Buttons -->
-                <div class="bridge-btn-group">
-                    <button class="chain-btn" id="btnLiteVM" onclick="switchToLiteVM()">🌐 LiteVM</button>
-                    <button class="chain-btn" id="btnSepolia" onclick="switchToSepolia()">🌐 Sepolia</button>
-                </div>
-                
-                <div style="background:#1a3a5c;padding:10px;border-radius:8px;margin-bottom:15px;font-size:12px;color:#58a6ff">
-            💡 <b>Cara Kerja Bridge:</b> Kirim dari network sekarang → Switch ke network tujuan → funds akan otomatis masuk (atau klaim manual)
-        </div>
-        <div class="balance-display">
-                    <div class="balance-row">
-                        <span class="balance-label">Your Balance</span>
-                        <span class="balance-value" id="bridgeNativeBalance">0 ETH</span>
-                    </div>
-                </div>
-                
-                <div class="input-group">
-                    <label class="input-label">Amount</label>
-                    <input type="number" id="bridgeAmount" class="input-field" placeholder="0.0">
-                </div>
-                
-                <div class="input-group">
-                    <label class="input-label">Recipient Address</label>
-                    <input type="text" id="bridgeRecipient" class="input-field" placeholder="0x...">
-                </div>
-                
-                <div class="input-group">
-                    <label class="input-label">Destination Chain</label>
-                    <select id="bridgeChain" class="token-select" style="width:100%">
-                        <option value="4441">LiteVM (zkLTC)</option>
-                        <option value="11155111">ETH Sepolia</option>
-                    </select>
-                </div>
-                
-                <button class="action-btn" id="bridgeBtn" onclick="doBridge()">Bridge Sekarang</button>
-                <button class="action-btn" id="claimBtn" onclick="manualUnlock()" style="margin-top:10px;background:#627eea">Klaim Funds (Setelah Bridge)</button>
-                
-                <div style="margin-top:15px;padding:12px;background:#1a3a5c;border-radius:10px">
-                    <div style="font-size:14px;font-weight:bold;margin-bottom:10px">🌉 Bridge Alternatif:</div>
-                    <a href="https://multyra.xyz" target="_blank" style="color:#58a6ff;font-size:13px">→ Multyra Bridge (Official LiteForge)</a>
-                </div>
-                
-                <div id="bridgeStatus"></div>
-            </div>
-        </div>
-        
-        <!-- Farm Tab -->
-        <div id="farm" class="tab-content">
-            <div class="card">
-                <div class="card-title">🌾 <span>Yield Farming</span></div>
-                
-                <!-- TKNA-USDC Pool -->
-                <div class="farm-pool">
-                    <div class="farm-pool-header">
-                        <span class="farm-pool-name">TKNA-USDC</span>
-                        <span class="farm-apr">APR 45.2%</span>
-                    </div>
-                    <div class="farm-stats">
-                        <div class="farm-stat">
-                            <div class="farm-stat-label">TVL</div>
-                            <div class="farm-stat-value" id="farmTVL1">Loading...</div>
-                        </div>
-                        <div class="farm-stat">
-                            <div class="farm-stat-label">Your Staked</div>
-                            <div class="farm-stat-value" id="farmStaked1">0 LP</div>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="container">
+                <div class="header-inner">
+                    <div class="logo">
+                        <div class="logo-icon">🚀</div>
+                        <div>
+                            <div class="logo-text">LiteForge</div>
+                            <div class="logo-sub">DeFi Protocol</div>
                         </div>
                     </div>
-                    <div class="farm-actions">
-                        <button class="farm-btn deposit" onclick="farmDeposit()">Deposit</button>
-                        <button class="farm-btn withdraw" onclick="farmWithdraw()">Withdraw</button>
-                    </div>
-                </div>
-                
-                <!-- TKNA-TKNB Pool -->
-                <div class="farm-pool">
-                    <div class="farm-pool-header">
-                        <span class="farm-pool-name">TKNA-TKNB</span>
-                        <span class="farm-apr">APR 38.7%</span>
-                    </div>
-                    <div class="farm-stats">
-                        <div class="farm-stat">
-                            <div class="farm-stat-label">TVL</div>
-                            <div class="farm-stat-value" id="farmTVL2">Loading...</div>
+                    <div class="header-nav">
+                        <div class="network-selector" onclick="switchNetwork()">
+                            <div class="network-dot"></div>
+                            <span id="networkName">LiteVM Testnet</span>
+                            <span style="color: var(--text-muted); font-size: 12px;">(4441)</span>
                         </div>
-                        <div class="farm-stat">
-                            <div class="farm-stat-label">Your Staked</div>
-                            <div class="farm-stat-value" id="farmStaked2">0 LP</div>
+                        <button class="wallet-btn" id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+                        <div class="wallet-connected" id="walletInfo" style="display: none;">
+                            <span class="wallet-address" id="walletAddress"></span>
+                            <span class="wallet-balance" id="walletBalance"></span>
                         </div>
                     </div>
-                    <div class="farm-actions">
-                        <button class="farm-btn deposit" onclick="farmDeposit()">Deposit</button>
-                        <button class="farm-btn withdraw" onclick="farmWithdraw()">Withdraw</button>
-                    </div>
                 </div>
-                
-                <div id="farmStatus"></div>
             </div>
-        </div>
-        
-    </div>
-    
-    <!-- Wallet Modal -->
-    <div class="modal-overlay" id="walletModal">
-        <div class="modal">
-            <div class="modal-title">Connect Wallet</div>
-            
-            <div class="wallet-option" onclick="doConnectWallet(); closeWalletModal();">
-                <div class="wallet-icon" style="background:#f6851b">🦊</div>
-                <span>MetaMask</span>
-            </div>
-            
-            <div class="wallet-option" onclick="alert('WalletConnect coming soon!'); closeWalletModal();">
-                <div class="wallet-icon" style="background:#3b99fc">🔗</div>
-                <span>WalletConnect (Coming Soon)</span>
-            </div>
-            
-            <div class="wallet-option" onclick="alert('Coinbase Wallet coming soon!'); closeWalletModal();">
-                <div class="wallet-icon" style="background:#0052ff">💰</div>
-                <span>Coinbase Wallet (Coming Soon)</span>
-            </div>
-        </div>
-    </div>
-    
-    <script>
+        </header>
 
-        const TOKENS = {
-            "0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052": { symbol: "TKNA", decimals: 18 },
-            "0x8370CfDe29eF5b0565e27e0643583a4784325946": { symbol: "TKNB", decimals: 18 },
-            "0xA92408f6dFfEb31d9Edc009b082e0f71f24c4db9": { symbol: "USDC", decimals: 6 },
-            "0x809b462E49aABe96f1C98740EFb08E7E5D9D5479": { symbol: "USDT", decimals: 6 },
-            "0x7ff130684E14FF810B8a97Ba9447FdFEB8e27CaE": { symbol: "WETH", decimals: 18 },
-            "0xf30f1b5c1CeFf5a093544a28A52133A8EF6fba2A": { symbol: "WBTC", decimals: 8 }
-        };
-        
-        const ROUTER = "0x0730CAF768686Be276d3c50cA400f870d8326dc5";
-        const FACTORY = "0xfd0D259C10DAa3FE2dB315eE19E4A8C3b98cc32a";
-        const FARM = "0x47ac007000F24AD4758eaA6Fcd1dAC020143C16a";
-        
-        let provider, signer, userAddress;
-        
-        const ERC20_ABI = [
-            "function approve(address, uint256) returns (bool)",
-            "function allowance(address, address) view returns (uint256)",
-            "function balanceOf(address) view returns (uint256)"
-        ];
-        
-        const ROUTER_ABI = [
-            "function swapExactTokensForTokens(uint256 amountIn, uint256 amountOutMin, address[] path, address to, uint256 deadline) returns (uint[] amounts)",
-            "function addLiquidity(address tokenA, address tokenB, uint256 amountADesired, uint256 amountBDesired, uint256 amountAMin, uint256 amountBMin, address to, uint256 deadline) returns (uint256 amountA, uint256 amountB, uint256 liquidity)"
-        ];
-        
-        const FARM_ABI = [
-            "function deposit(uint256 _pid, uint256 _amount)",
-            "function withdraw(uint256 _pid, uint256 _amount)",
-            "function userInfo(uint256, address) view returns (uint256, uint256)",
-            "function totalDeposits() view returns (uint256)"
-        ];
-        
-        const BRIDGE_ABI = [
-            "function lockEth(uint256 destinationChain, address recipient) payable",
-            "function lockToken(address token, uint256 amount, uint256 destinationChain, address recipient)",
-            "function unlockEth(address recipient, uint256 amount, bytes32 lockId)",
-            "function selfRelay(bytes32 lockId)",
-            "function getPendingLocks(address) view returns (bytes32[])",
-            "function getLockInfo(uint256) view returns (address, address, uint256, uint256, address, uint256)",
-            "function getLockCount() view returns (uint256)",
-            "function processedMessages(bytes32) view returns (bool)"
-        ];
-        
-        function showTab(tabName, el) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            if(el) el.classList.add('active');
-        }
-        
-        function openWalletModal() {
-            document.getElementById('walletModal').style.display = 'flex';
-        }
-        
-        function closeWalletModal() {
-            document.getElementById('walletModal').style.display = 'none';
-        }
-        
-        async function doConnectWallet() {
-            if (!window.ethereum) {
-                alert('MetaMask not found!');
-                return;
-            }
-            
-            try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                if (accounts.length === 0) {
-                    alert('Please unlock MetaMask');
-                    return;
-                }
-                
-                userAddress = accounts[0];
-                provider = new ethers.BrowserProvider(window.ethereum);
-                signer = await provider.getSigner();
-                
-                document.getElementById('connectBtn').textContent = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
-                document.getElementById('swapBtn').textContent = 'Swap';
-                document.getElementById('swapBtn').disabled = false;
-                document.getElementById('addLiquidityBtn').disabled = false;
-                
-                await updateBalances();
-                await updateNetworkDisplay();
-                await updateFarmData();
-                
-            } catch(e) {
-                console.error(e);
-                alert('Connection error: ' + e.message);
-            }
-        }
-        
-        async function updateNetworkDisplay() {
-            if (!window.ethereum) return;
-            try {
-                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                const chainNum = parseInt(chainId, 16);
-                const name = chainNum === 4441 ? 'LiteVM' : chainNum === 11155111 ? 'Sepolia' : 'Unknown';
-                document.getElementById('networkBadge').textContent = name;
-                
-                document.getElementById('btnLiteVM').classList.toggle('active', chainNum === 4441);
-                document.getElementById('btnSepolia').classList.toggle('active', chainNum === 11155111);
-            } catch(e) {}
-        }
-        
-        async function updateBalances() {
-            if (!userAddress || !provider) return;
-            
-            try {
-                const chainId = await window.ethereum?.request({ method: 'eth_chainId' });
-                const chainNum = chainId ? parseInt(chainId, 16) : 4441;
-                const symbol = chainNum === 4441 ? 'zkLTC' : 'ETH';
-                
-                const nativeBal = await provider.getBalance(userAddress);
-                const bridgeNativeEl = document.getElementById('bridgeNativeBalance');
-                if (bridgeNativeEl) {
-                    const balanceNum = Number(nativeBal / 1n) / 1e18;
-                    bridgeNativeEl.textContent = balanceNum.toFixed(6) + ' ' + symbol;
-                }
-                
-                const fromToken = document.getElementById('fromToken')?.value;
-                const toToken = document.getElementById('toToken')?.value;
-                
-                for (const [addr, info] of Object.entries(TOKENS)) {
-                    try {
-                        const token = new ethers.Contract(addr, ERC20_ABI, provider);
-                        const bal = await token.balanceOf(userAddress);
-                        const balNum = Number(bal / 1n) / Math.pow(10, info.decimals);
+        <div id="status" class="status"></div>
+
+        <nav class="tabs container">
+            <div class="tab active" onclick="showTab('swap')">
+                <span class="tab-icon">💱</span>
+                <span>Swap</span>
+            </div>
+            <div class="tab" onclick="showTab('liquidity')">
+                <span class="tab-icon">🌊</span>
+                <span>Liquidity</span>
+            </div>
+            <div class="tab" onclick="showTab('farm')">
+                <span class="tab-icon">🌾</span>
+                <span>Farm</span>
+            </div>
+            <div class="tab" onclick="showTab('bridge')">
+                <span class="tab-icon">🌉</span>
+                <span>Bridge</span>
+            </div>
+            <div class="tab" onclick="showTab('tokens')">
+                <span class="tab-icon">🪙</span>
+                <span>Tokens</span>
+            </div>
+        </nav>
+
+        <main class="container">
+            <div class="content-grid">
+                <!-- Main Panel -->
+                <div>
+                    <!-- Swap Section -->
+                    <div id="swap" class="section active">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">💱 Swap Tokens</h2>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">From</label>
+                                <div class="token-row">
+                                    <input type="number" class="form-input" id="swapFromAmount" placeholder="0.00" style="flex: 1; background: transparent; border: none;">
+                                    <select class="form-input form-select" id="swapFromToken" style="width: 120px;">
+                                        <option value="0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052">TKNA</option>
+                                        <option value="0x8370CfDe29eF5b0565e27e0643583a4784325946">TKNB</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div style="text-align: center; padding: 8px;">
+                                <span style="font-size: 24px; color: var(--accent-primary);">⬇️</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">To</label>
+                                <div class="token-row">
+                                    <input type="number" class="form-input" id="swapToAmount" placeholder="0.00" style="flex: 1; background: transparent; border: none;" readonly>
+                                    <select class="form-input form-select" id="swapToToken" style="width: 120px;">
+                                        <option value="0x8370CfDe29eF5b0565e27e0643583a4784325946">TKNB</option>
+                                        <option value="0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052">TKNA</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="stats-grid" style="margin-top: 16px;">
+                                <div class="stat-box">
+                                    <div class="stat-value" id="swapRate">-</div>
+                                    <div class="stat-label">Exchange Rate</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-value" id="swapSlippage">0.5%</div>
+                                    <div class="stat-label">Slippage</div>
+                                </div>
+                            </div>
+
+                            <button class="action-btn" onclick="doSwap()">Swap Now</button>
+                        </div>
+                    </div>
+
+                    <!-- Liquidity Section -->
+                    <div id="liquidity" class="section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">🌊 Add Liquidity</h2>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Token A Amount</label>
+                                <input type="number" class="form-input" id="liqAmountA" placeholder="0.00">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Token B Amount</label>
+                                <input type="number" class="form-input" id="liqAmountB" placeholder="0.00">
+                            </div>
+
+                            <button class="action-btn" onclick="addLiquidity()">Add Liquidity</button>
+                        </div>
+
+                        <div class="card" style="margin-top: 16px;">
+                            <div class="card-header">
+                                <h2 class="card-title">📊 Your Positions</h2>
+                            </div>
+                            <div class="stats-grid">
+                                <div class="stat-box">
+                                    <div class="stat-value" id="lpBalance">0.00</div>
+                                    <div class="stat-label">LP Tokens</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-value" id="poolReserves">-</div>
+                                    <div class="stat-label">Pool Reserves</div>
+                                </div>
+                            </div>
+                            <button class="action-btn secondary" onclick="removeLiquidity()">Remove Liquidity</button>
+                        </div>
+                    </div>
+
+                    <!-- Farm Section -->
+                    <div id="farm" class="section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">🌾 Stake & Earn</h2>
+                            </div>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-box">
+                                    <div class="stat-value" id="stakedAmount">0.00</div>
+                                    <div class="stat-label">Your Staked</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-value" id="pendingRewards">0.00</div>
+                                    <div class="stat-label">Pending Rewards</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-value" id="totalLocked">0.00</div>
+                                    <div class="stat-label">Total Locked</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-value">25.5%</div>
+                                    <div class="stat-label">APR</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Stake Amount</label>
+                                <input type="number" class="form-input" id="stakeAmount" placeholder="0.00">
+                            </div>
+
+                            <button class="action-btn" onclick="stake()">Stake</button>
+                            <button class="action-btn secondary" onclick="unstake()">Unstake</button>
+                            <button class="action-btn" onclick="claimRewards()" style="background: var(--accent-secondary);">Claim Rewards</button>
+                        </div>
+                    </div>
+
+                    <!-- Bridge Section -->
+                    <div id="bridge" class="section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">🌉 Cross-Chain Bridge</h2>
+                            </div>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-box">
+                                    <div class="stat-value" id="bridgeBalance">0.00</div>
+                                    <div class="stat-label">Your Balance</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-value" id="pendingBridge">0.00</div>
+                                    <div class="stat-label">Pending</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Amount</label>
+                                <input type="number" class="form-input" id="bridgeAmount" placeholder="0.00">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Destination Chain</label>
+                                <select class="form-input form-select" id="destChain">
+                                    <option value="4441">LiteVM → Sepolia</option>
+                                    <option value="11155111">Sepolia → LiteVM</option>
+                                </select>
+                            </div>
+
+                            <button class="action-btn" onclick="doBridge()">Bridge Now</button>
+                            
+                            <div style="margin-top: 16px; padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-md);">
+                                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Alternative:</div>
+                                <a href="https://multyra.xyz" target="_blank" style="color: var(--accent-primary); font-size: 14px;">→ Use Multyra Bridge (Official)</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tokens Section -->
+                    <div id="tokens" class="section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">🪙 Token List</h2>
+                            </div>
+                            
+                            <div style="display: grid; gap: 12px;">
+                                <div class="token-row">
+                                    <div class="token-icon" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">T</div>
+                                    <div class="token-info">
+                                        <div class="token-symbol">TKNA</div>
+                                        <div class="token-balance">Token A</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div class="token-symbol" id="tknaBalance">0.00</div>
+                                        <div class="token-balance">Balance</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="token-row">
+                                    <div class="token-icon" style="background: linear-gradient(135deg, #22c55e, #16a34a);">T</div>
+                                    <div class="token-info">
+                                        <div class="token-symbol">TKNB</div>
+                                        <div class="token-balance">Token B</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div class="token-symbol" id="tknbBalance">0.00</div>
+                                        <div class="token-balance">Balance</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="token-row">
+                                    <div class="token-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">W</div>
+                                    <div class="token-info">
+                                        <div class="token-symbol">wETH</div>
+                                        <div class="token-balance">Wrapped Ether</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div class="token-symbol" id="wethBalance">0.00</div>
+                                        <div class="token-balance">Balance</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="token-row">
+                                    <div class="token-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">R</div>
+                                    <div class="token-info">
+                                        <div class="token-symbol">REWARD</div>
+                                        <div class="token-balance">Farm Reward</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div class="token-symbol" id="rewardBalance">0.00</div>
+                                        <div class="token-balance">Balance</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="margin-top: 16px;">
+                            <div class="card-header">
+                                <h2 class="card-title">⚙️ Contract Addresses</h2>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-muted); space: 8px;">
+                                <div style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                                    <span style="color: var(--text-secondary);">Router:</span>
+                                    <code style="color: var(--accent-primary); margin-left: 8px;">0x62Ec2dA79c0A27A3BE3cf85Ad40c590dAC7DA49D</code>
+                                </div>
+                                <div style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                                    <span style="color: var(--text-secondary);">Factory:</span>
+                                    <code style="color: var(--accent-primary); margin-left: 8px;">0xfd0D259C10DAa3FE2dB315eE19E4A8C3b98cc32a</code>
+                                </div>
+                                <div style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                                    <span style="color: var(--text-secondary);">Farm:</span>
+                                    <code style="color: var(--accent-primary); margin-left: 8px;">0x47ac007000F24AD4758eaA6Fcd1dAC020143C16a</code>
+                                </div>
+                                <div style="padding: 8px 0;">
+                                    <span style="color: var(--text-secondary);">WETH:</span>
+                                    <code style="color: var(--accent-primary); margin-left: 8px;">0xdF0615E3B4a9C1549b213e705a8e7051a7d8a4DE</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Side Panel -->
+                <div>
+                    <div class="card" style="position: sticky; top: 100px;">
+                        <div class="card-header">
+                            <h2 class="card-title">📈 Market Stats</h2>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <div class="stat-value">$2.4M</div>
+                                <div class="stat-label">Total Value Locked</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">$1.2M</div>
+                                <div class="stat-label">24h Volume</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">2,847</div>
+                                <div class="stat-label">Total Users</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">12</div>
+                                <div class="stat-label">Trading Pairs</div>
+                            </div>
+                        </div>
                         
-                        if (fromToken === addr) {
-                            document.getElementById('fromBalance').textContent = 'Balance: ' + balNum.toFixed(4);
-                        }
-                        if (toToken === addr) {
-                            document.getElementById('toBalance').textContent = 'Balance: ' + balNum.toFixed(4);
-                        }
-                    } catch(e) {}
-                }
-            } catch(e) {
-                console.log('Balance error:', e);
+                        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                            <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Quick Links</div>
+                            <a href="#" style="display: block; padding: 8px 0; color: var(--accent-primary); font-size: 14px;">📖 Documentation</a>
+                            <a href="#" style="display: block; padding: 8px 0; color: var(--accent-primary); font-size: 14px;">💬 Discord</a>
+                            <a href="#" style="display: block; padding: 8px 0; color: var(--accent-primary); font-size: 14px;">🐦 Twitter</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="container">
+                <p>🚀 LiteForge DeFi | Built on LiteVM Testnet | Chain ID: 4441</p>
+                <p style="margin-top: 8px;">RPC: <code style="color: var(--accent-primary);">https://liteforge.rpc.caldera.xyz/infra-partner-http</code></p>
+            </div>
+        </footer>
+    </div>
+    <script>
+        // Configuration
+        const CONFIG = {
+            chainId: 4441,
+            chainIdHex: '0x1159',
+            chainName: 'LiteVM Testnet',
+            rpcUrl: 'https://liteforge.rpc.caldera.xyz/infra-partner-http',
+            router: '0x62Ec2dA79c0A27A3BE3cf85Ad40c590dAC7DA49D',
+            factory: '0xfd0D259C10DAa3FE2dB315eE19E4A8C3b98cc32a',
+            pair: '0x4e7e5efdF721b92e7eb974E2f313fEdefc81Db03',
+            farm: '0x47ac007000F24AD4758eaA6Fcd1dAC020143C16a',
+            farmPid: 0,
+            tokens: {
+                TKNA: '0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052',
+                TKNB: '0x8370CfDe29eF5b0565e27e0643583a4784325946',
+                wETH: '0xdF0615E3B4a9C1549b213e705a8e7051a7d8a4DE',
+                REWARD: '0x0E93a836722D5712C8cF4bB41076b1121bfC8FC4'
+            }
+        };
+
+        const ERC20_ABI = [
+            'function approve(address spender, uint256 amount) returns (bool)',
+            'function allowance(address owner, address spender) view returns (uint256)',
+            'function balanceOf(address account) view returns (uint256)',
+            'function decimals() view returns (uint8)'
+        ];
+
+        const ROUTER_ABI = [
+            'function addLiquidity(address tokenA, address tokenB, uint256 amountADesired, uint256 amountBDesired, uint256 amountAMin, uint256 amountBMin, address to, uint256 deadline)',
+            'function swapExactTokensForTokens(uint256 amountIn, uint256 amountOutMin, address[] path, address to, uint256 deadline)',
+            'function getAmountsOut(uint256 amountIn, address[] path) view returns (uint256[])',
+            'function getReserves() view returns (uint112, uint112, uint32)'
+        ];
+
+        const FARM_ABI = [
+            'function deposit(uint256 pid, uint256 amount)',
+            'function withdraw(uint256 pid, uint256 amount)',
+            'function pendingReward(uint256 pid, address user) view returns (uint256)',
+            'function userInfo(uint256 pid, address user) view returns (uint256, uint256)',
+            'function poolInfo(uint256 pid) view returns (address, uint256, uint256, uint256, uint256)'
+        ];
+
+        // State
+        let provider, signer, userAddress;
+        let currentChain = CONFIG.chainId;
+
+        // Initialize
+        async function init() {
+            if (typeof window.ethereum !== 'undefined') {
+                provider = new ethers.BrowserProvider(window.ethereum);
+                
+                window.ethereum.on('accountsChanged', handleAccountsChanged);
+                window.ethereum.on('chainChanged', handleChainChanged);
+                
+                await checkConnection();
             }
         }
-        
-        async function updateFarmData() {
-            if (!userAddress || !provider) return;
-            
-            try {
-                const farm = new ethers.Contract(FARM, FARM_ABI, provider);
-                
-                const [staked] = await farm.userInfo(0, userAddress);
-                const stakedNum = Number(staked / 1n) / 1e18;
-                
-                document.getElementById('farmStaked1').textContent = stakedNum.toFixed(4) + ' LP';
-                document.getElementById('farmStaked2').textContent = stakedNum.toFixed(4) + ' LP';
-                
-                try {
-                    const totalDeposits = await farm.totalDeposits();
-                    const tvlNum = Number(totalDeposits / 1n) / 1e18;
-                    document.getElementById('farmTVL1').textContent = '$' + tvlNum.toFixed(0);
-                    document.getElementById('farmTVL2').textContent = '$' + (tvlNum * 0.7).toFixed(0);
-                } catch(e) {
-                    document.getElementById('farmTVL1').textContent = '$0';
-                    document.getElementById('farmTVL2').textContent = '$0';
-                }
-            } catch(e) {
-                console.log('Farm data error:', e);
-            }
-        }
-        
-        async function switchToLiteVM() {
-            try {
-                await window.ethereum.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0x1159' }]
-                });
-            } catch(e) {
-                await window.ethereum.request({
-                    method: 'wallet_addEthereumChain',
-                    params: [{
-                        chainId: '0x1159',
-                        chainName: 'LiteVM Testnet',
-                        nativeCurrency: { name: 'zkLTC', symbol: 'zkLTC', decimals: 18 },
-                        rpcUrls: ['https://liteforge.rpc.caldera.xyz/infra-partner-http'],
-                        blockExplorerUrls: ['https://liteforge.explorer.caldera.xyz']
-                    }]
-                });
-            }
-            updateNetworkDisplay();
-        }
-        
-        async function switchToSepolia() {
-            try {
-                await window.ethereum.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0xaa36a7' }]
-                });
-            } catch(e) {
-                await window.ethereum.request({
-                    method: 'wallet_addEthereumChain',
-                    params: [{
-                        chainId: '0xaa36a7',
-                        chainName: 'ETH Sepolia',
-                        nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-                        rpcUrls: ['https://1rpc.io/sepolia'],
-                        blockExplorerUrls: ['https://sepolia.etherscan.io']
-                    }]
-                });
-            }
-            updateNetworkDisplay();
-        }
-        
-        function swapTokens() {
-            const from = document.getElementById('fromToken').value;
-            const to = document.getElementById('toToken').value;
-            document.getElementById('fromToken').value = to;
-            document.getElementById('toToken').value = from;
-            updateSwap();
-        }
-        
-        async function updateSwap() {
-            const fromToken = document.getElementById('fromToken').value;
-            const toToken = document.getElementById('toToken').value;
-            
-            document.getElementById('fromSymbol').textContent = TOKENS[fromToken]?.symbol || '???';
-            document.getElementById('toSymbol').textContent = TOKENS[toToken]?.symbol || '???';
-            
-            await updateBalances();
-        }
-        
-        async function doSwap() {
-            if (!signer) return;
-            
-            const statusEl = document.getElementById('swapStatus');
-            statusEl.innerHTML = '<div class="status processing">Processing...</div>';
-            
-            try {
-                const fromToken = document.getElementById('fromToken').value;
-                const toToken = document.getElementById('toToken').value;
-                const amount = document.getElementById('fromAmount').value;
-                
-                const fromInfo = TOKENS[fromToken];
-                const amountIn = fromInfo.decimals === 6 ? 
-                    ethers.parseUnits(amount, 6) : 
-                    ethers.parseEther(amount);
-                
-                const router = new ethers.Contract(ROUTER, ROUTER_ABI, signer);
-                
-                const token = new ethers.Contract(fromToken, ERC20_ABI, signer);
-                await token.approve(ROUTER, amountIn);
-                
-                const tx = await router.swapExactTokensForTokens(
-                    amountIn, 0,
-                    [fromToken, toToken],
-                    userAddress,
-                    Math.floor(Date.now() / 1000) + 600
-                );
-                
-                await tx.wait();
-                statusEl.innerHTML = '<div class="status success">Swap Successful!</div>';
-                await updateBalances();
-                
-            } catch(e) {
-                console.error(e);
-                statusEl.innerHTML = '<div class="status error">Error: ' + (e.reason || e.message).slice(0, 50) + '</div>';
-            }
-        }
-        
-        async function addLiquidity() {
-            if (!signer) return;
-            
-            const statusEl = document.getElementById('liquidityStatus');
-            statusEl.innerHTML = '<div class="status processing">Processing...</div>';
-            
-            try {
-                const tokenA = document.getElementById('tokenA').value;
-                const tokenB = document.getElementById('tokenB').value;
-                const amountA = document.getElementById('amountA').value;
-                const amountB = document.getElementById('amountB').value;
-                
-                const router = new ethers.Contract(ROUTER, ROUTER_ABI, signer);
-                
-                const tokenAContract = new ethers.Contract(tokenA, ERC20_ABI, signer);
-                const tokenBContract = new ethers.Contract(tokenB, ERC20_ABI, signer);
-                
-                const decimalsA = TOKENS[tokenA].decimals;
-                const decimalsB = TOKENS[tokenB].decimals;
-                
-                const amountADesired = decimalsA === 6 ? ethers.parseUnits(amountA, 6) : ethers.parseEther(amountA);
-                const amountBDesired = decimalsB === 6 ? ethers.parseUnits(amountB, 6) : ethers.parseEther(amountB);
-                
-                await tokenAContract.approve(ROUTER, amountADesired);
-                await tokenBContract.approve(ROUTER, amountBDesired);
-                
-                const tx = await router.addLiquidity(
-                    tokenA, tokenB,
-                    amountADesired, amountBDesired, 0, 0,
-                    userAddress,
-                    Math.floor(Date.now() / 1000) + 600
-                );
-                
-                await tx.wait();
-                statusEl.innerHTML = '<div class="status success">Liquidity Added!</div>';
-                
-            } catch(e) {
-                console.error(e);
-                statusEl.innerHTML = '<div class="status error">Error: ' + (e.reason || e.message).slice(0, 50) + '</div>';
-            }
-        }
-        
-        const LITEVM_BRIDGE = "0x78c397C8d84a5F0f05EE749fb08f629B0a7FB2e7";
-        const SEPOLIA_BRIDGE = "0x8bc25dB1feda8Fc5eB20d0117Ff1f965F2F4E29C";
-        const WETH_TOKEN = "0xdF0615E3B4a9C1549b213e705a8e7051a7d8a4DE";
-        const RELAYER = "0x30Eb5B1adC393F24567bB8E939b0ff5eC3C41D65";
-        
-        async function doBridge() {
-            if (!signer || !userAddress) {
-                alert('Please connect wallet first');
-                return;
-            }
-            
-            const amount = document.getElementById('bridgeAmount').value;
-            const recipient = document.getElementById('bridgeRecipient').value;
-            const destChain = document.getElementById('bridgeChain').value;
-            
-            if (!amount || parseFloat(amount) <= 0) {
-                alert('Invalid amount');
-                return;
-            }
-            if (!recipient || !recipient.startsWith('0x')) {
-                alert('Invalid recipient address');
-                return;
-            }
-            
-            const statusEl = document.getElementById('bridgeStatus');
-            statusEl.innerHTML = '<div class="status processing">Processing...</div>';
-            
-            try {
-                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                const currentChain = parseInt(chainId, 16);
-                
-                const bridgeAddr = currentChain === 11155111 ? SEPOLIA_BRIDGE : LITEVM_BRIDGE;
-                
-                const bridge = new ethers.Contract(bridgeAddr, BRIDGE_ABI, signer);
-                
-                const tx = await bridge.lockEth(destChain, recipient, {
-                    value: ethers.parseEther(amount)
-                });
-                
-                await tx.wait();
-                statusEl.innerHTML = '<div class="status processing">Menunggu confirm...</div>';
-                
-                // Wait for confirmation
-                await tx.wait();
-                
-                statusEl.innerHTML = '<div class="status success">Bridge Initiated! Sekarang switch network dan klaim.</div>';
-                
-                // Auto-relay after delay
-                setTimeout(async () => {
-                    try {
-                        await selfRelayFunds(destChain, recipient);
-                    } catch(e) {
-                        console.log('Auto-relay: switch manual dan klik Claim');
-                    }
-                }, 5000);
-                
-            } catch(e) {
-                console.error(e);
-                statusEl.innerHTML = '<div class="status error">Error: ' + (e.reason || e.message).slice(0, 60) + '</div>';
-            }
-        }
-        
-        // Auto-claim function
-        async function autoClaim(destChain, recipient) {
-            if (!signer) return;
-            
-            try {
-                // Switch to destination chain
-                if (destChain === '4441') {
-                    await switchToLiteVM();
-                } else {
-                    await switchToSepolia();
-                }
-                
-                // Wait for chain switch
-                await new Promise(r => setTimeout(r, 2000));
-                
-                // Get the bridge on destination chain
-                const bridgeAddr = destChain === '4441' ? SEPOLIA_BRIDGE : LITEVM_BRIDGE;
-                const bridge = new ethers.Contract(bridgeAddr, [
-                    "function unlockEth(address recipient, uint256 amount, bytes32 nonce)"
-                ], signer);
-                
-                // Try to unlock (this may fail if no funds locked, which is expected)
-                // The actual flow is: lock on source -> relayer unlocks on destination
-                console.log('Claim check: Please wait for relayer or switch to destination network');
-            } catch(e) {
-                console.log('Claim error:', e.message);
-            }
-        }
-        
-        async function farmDeposit() {
-            if (!signer || !userAddress) {
-                alert('Please connect wallet first');
-                return;
-            }
-            
-            const statusEl = document.getElementById('farmStatus');
-            statusEl.innerHTML = '<div class="status processing">Processing...</div>';
-            
-            try {
-                const farm = new ethers.Contract(FARM, FARM_ABI, signer);
-                
-                const lpToken = "0x480377F7f118Bf048be5f7F5c9EBC67Cd50cb9Fd";
-                const amount = "1";
-                const amountIn = ethers.parseEther(amount);
-                
-                const token = new ethers.Contract(lpToken, ERC20_ABI, signer);
-                await token.approve(FARM, amountIn);
-                
-                const tx = await farm.deposit(0, amountIn);
-                await tx.wait();
-                
-                statusEl.innerHTML = '<div class="status success">Deposited to Farm!</div>';
-                await updateFarmBalances();
-                
-            } catch(e) {
-                console.error(e);
-                statusEl.innerHTML = '<div class="status error">Error: ' + (e.reason || e.message).slice(0, 50) + '</div>';
-            }
-        }
-        
-        async function farmWithdraw() {
-            if (!signer || !userAddress) {
-                alert('Please connect wallet first');
-                return;
-            }
-            
-            const statusEl = document.getElementById('farmStatus');
-            statusEl.innerHTML = '<div class="status processing">Processing...</div>';
-            
-            try {
-                const farm = new ethers.Contract(FARM, FARM_ABI, signer);
-                
-                const amount = "1";
-                const amountIn = ethers.parseEther(amount);
-                
-                const tx = await farm.withdraw(0, amountIn);
-                await tx.wait();
-                
-                statusEl.innerHTML = '<div class="status success">Withdrawn from Farm!</div>';
-                await updateFarmBalances();
-                
-            } catch(e) {
-                console.error(e);
-                statusEl.innerHTML = '<div class="status error">Error: ' + (e.reason || e.message).slice(0, 50) + '</div>';
-            }
-        }
-        
-        async function updateFarmBalances() {
-            await updateFarmData();
-        }
-        
-        async function initApp() {
-            if (!window.ethereum) return;
-            
+
+        async function checkConnection() {
             try {
                 const accounts = await window.ethereum.request({ method: 'eth_accounts' });
                 if (accounts.length > 0) {
                     userAddress = accounts[0];
-                    provider = new ethers.BrowserProvider(window.ethereum);
                     signer = await provider.getSigner();
-                    
-                    document.getElementById('connectBtn').textContent = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
-                    document.getElementById('swapBtn').textContent = 'Swap';
-                    document.getElementById('swapBtn').disabled = false;
-                    document.getElementById('addLiquidityBtn').disabled = false;
-                    
-                    await updateBalances();
-                    await updateNetworkDisplay();
-                    await updateFarmData();
+                    updateWalletUI();
+                    await refreshBalances();
                 }
             } catch(e) {
-                console.log('Auto-connect failed:', e);
+                console.log('Not connected');
             }
         }
-        
-        if (window.ethereum) {
-            window.ethereum.on('accountsChanged', async (accounts) => {
-                if (accounts.length === 0) {
-                    userAddress = null;
-                    document.getElementById('connectBtn').textContent = 'Connect Wallet';
-                    document.getElementById('swapBtn').disabled = true;
-                    document.getElementById('swapBtn').textContent = 'Connect Wallet First';
-                } else {
-                    location.reload();
-                }
-            });
-            
-            window.ethereum.on('chainChanged', () => {
-                location.reload();
-            });
-        }
-        
-        // Claim function - for recipient to claim bridged funds
-        async function manualUnlock() {
-            if (!signer || !userAddress) {
-                alert('Connect wallet first');
-                return;
-            }
-            
-            const statusEl = document.getElementById('bridgeStatus');
-            statusEl.innerHTML = '<div class="status processing">Checking balance...</div>';
-            
-            try {
-                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                const currentChain = parseInt(chainId, 16);
-                
-                const bal = await provider.getBalance(userAddress);
-                const symbol = currentChain === 4441 ? 'zkLTC' : 'ETH';
-                statusEl.innerHTML = '<div class="status success">Balance: ' + (Number(bal)/1e18).toFixed(6) + ' ' + symbol + '</div>';
-                
-            } catch(e) {
-                statusEl.innerHTML = '<div class="status error">Error: ' + e.message.slice(0, 40) + '</div>';
-            }
-        }
-        
-        async function doClaim() {
-            if (!signer || !userAddress) {
-                alert('Please connect wallet first');
-                return;
-            }
-            
-            const statusEl = document.getElementById('bridgeStatus');
-            statusEl.innerHTML = '<div class="status processing">Mencoba klaim...</div>';
-            
-            try {
-                // Get current chain
-                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                const currentChain = parseInt(chainId, 16);
-                
-                // Get bridge on current chain
-                const bridgeAddr = currentChain === 11155111 ? SEPOLIA_BRIDGE : LITEVM_BRIDGE;
-                
-                // Try to call unlock function (this will fail if no funds pending)
-                const bridge = new ethers.Contract(bridgeAddr, [
-                    "function unlockEth(address recipient, uint256 amount, bytes32 nonce)"
-                ], signer);
-                
-                // For demo, show message about how to claim
-                statusEl.innerHTML = '<div class="status">Untuk klaim: Pastikan sudah switch ke network tujuan, lalu coba lock ulang dengan amount 0 atau hubungi support.</div>';
-                
-                // Check balance
-                const bal = await provider.getBalance(userAddress);
-                statusEl.innerHTML = '<div class="status success">Balance sekarang: ' + (Number(bal)/1e18).toFixed(6) + ' ' + (currentChain === 4441 ? 'zkLTC' : 'ETH') + '</div>';
-                
-            } catch(e) {
-                console.error(e);
-                statusEl.innerHTML = '<div class="status error">Error: ' + e.message.slice(0, 50) + '</div>';
-            }
-        }
-        
-        initApp();
-    </script>
 
-</script>
+        function handleAccountsChanged(accounts) {
+            if (accounts.length === 0) {
+                disconnectWallet();
+            } else if (accounts[0] !== userAddress) {
+                userAddress = accounts[0];
+                updateWalletUI();
+                refreshBalances();
+            }
+        }
+
+        function handleChainChanged(chainId) {
+            currentChain = parseInt(chainId, 16);
+            document.getElementById('networkName').textContent = currentChain === 4441 ? 'LiteVM Testnet' : 'Unknown';
+            refreshBalances();
+        }
+
+        // Wallet Functions
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                showStatus('Please install MetaMask!', 'error');
+                return;
+            }
+
+            try {
+                await switchToNetwork();
+                
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAddress = accounts[0];
+                signer = await provider.getSigner();
+                
+                updateWalletUI();
+                await refreshBalances();
+                showStatus('Wallet connected!', 'success');
+            } catch(e) {
+                showStatus('Failed to connect: ' + e.message.slice(0, 50), 'error');
+            }
+        }
+
+        function disconnectWallet() {
+            userAddress = null;
+            signer = null;
+            document.getElementById('connectBtn').style.display = 'inline-block';
+            document.getElementById('walletInfo').style.display = 'none';
+        }
+
+        function updateWalletUI() {
+            if (userAddress) {
+                document.getElementById('connectBtn').style.display = 'none';
+                document.getElementById('walletInfo').style.display = 'flex';
+                document.getElementById('walletAddress').textContent = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+            }
+        }
+
+        async function switchToNetwork() {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: CONFIG.chainIdHex }]
+                });
+            } catch(switchError) {
+                if (switchError.code === 4902) {
+                    await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [{
+                            chainId: CONFIG.chainIdHex,
+                            chainName: 'LiteVM Testnet',
+                            nativeCurrency: { name: 'zkLTC', symbol: 'zkLTC', decimals: 18 },
+                            rpcUrls: [CONFIG.rpcUrl],
+                            blockExplorerUrls: ['https://liteforge.caldera.xyz']
+                        }]
+                    });
+                }
+            }
+        }
+
+        async function switchNetwork() {
+            await switchToNetwork();
+        }
+
+        // Balance Functions
+        async function refreshBalances() {
+            if (!userAddress) return;
+
+            try {
+                // Native balance
+                const nativeBal = await provider.getBalance(userAddress);
+                document.getElementById('walletBalance').textContent = (Number(nativeBal) / 1e18).toFixed(4) + ' zkLTC';
+                document.getElementById('bridgeBalance').textContent = (Number(nativeBal) / 1e18).toFixed(4);
+
+                // Token balances
+                for (const [symbol, address] of Object.entries(CONFIG.tokens)) {
+                    const token = new ethers.Contract(address, ERC20_ABI, provider);
+                    const bal = await token.balanceOf(userAddress);
+                    const elem = document.getElementById(symbol.toLowerCase() + 'Balance');
+                    if (elem) {
+                        elem.textContent = (Number(bal) / 1e18).toFixed(4);
+                    }
+                }
+
+                // Farm data
+                await refreshFarmData();
+            } catch(e) {
+                console.error('Error refreshing balances:', e);
+            }
+        }
+
+        async function refreshFarmData() {
+            if (!userAddress) return;
+
+            try {
+                const farm = new ethers.Contract(CONFIG.farm, FARM_ABI, provider);
+                
+                const userInfo = await farm.userInfo(CONFIG.farmPid, userAddress);
+                const pending = await farm.pendingReward(CONFIG.farmPid, userAddress);
+                const poolInfo = await farm.poolInfo(CONFIG.farmPid);
+
+                document.getElementById('stakedAmount').textContent = (Number(userInfo[0]) / 1e18).toFixed(4);
+                document.getElementById('pendingRewards').textContent = (Number(pending) / 1e18).toFixed(4);
+                document.getElementById('totalLocked').textContent = (Number(poolInfo[2]) / 1e18).toFixed(2);
+            } catch(e) {
+                console.error('Farm error:', e);
+            }
+        }
+
+        // Swap Functions
+        async function doSwap() {
+            if (!signer) return showStatus('Connect wallet first!', 'error');
+
+            try {
+                const amount = document.getElementById('swapFromAmount').value;
+                const fromToken = document.getElementById('swapFromToken').value;
+                const toToken = document.getElementById('swapToToken').value;
+
+                if (!amount || parseFloat(amount) <= 0) return showStatus('Enter amount!', 'error');
+
+                showStatus('Processing swap...', 'info');
+
+                const token = new ethers.Contract(fromToken, ERC20_ABI, signer);
+                const amountWei = ethers.parseEther(amount);
+                
+                const allowance = await token.allowance(userAddress, CONFIG.router);
+                if (allowance < amountWei) {
+                    const tx = await token.approve(CONFIG.router, amountWei);
+                    await tx.wait();
+                }
+
+                const router = new ethers.Contract(CONFIG.router, ROUTER_ABI, signer);
+                const deadline = Math.floor(Date.now() / 1000) + 3600;
+
+                const tx = await router.swapExactTokensForTokens(
+                    amountWei,
+                    0,
+                    [fromToken, toToken],
+                    userAddress,
+                    deadline
+                );
+
+                await tx.wait();
+                showStatus('Swap completed!', 'success');
+                await refreshBalances();
+            } catch(e) {
+                showStatus('Swap failed: ' + e.message.slice(0, 60), 'error');
+            }
+        }
+
+        // Liquidity Functions
+        async function addLiquidity() {
+            if (!signer) return showStatus('Connect wallet first!', 'error');
+
+            try {
+                const amountA = document.getElementById('liqAmountA').value;
+                const amountB = document.getElementById('liqAmountB').value;
+
+                if (!amountA || !amountB) return showStatus('Enter amounts!', 'error');
+
+                showStatus('Adding liquidity...', 'info');
+
+                const router = new ethers.Contract(CONFIG.router, ROUTER_ABI, signer);
+                const deadline = Math.floor(Date.now() / 1000) + 3600;
+
+                const tx = await router.addLiquidity(
+                    CONFIG.tokens.TKNA,
+                    CONFIG.tokens.TKNB,
+                    ethers.parseEther(amountA),
+                    ethers.parseEther(amountB),
+                    0,
+                    0,
+                    userAddress,
+                    deadline
+                );
+
+                await tx.wait();
+                showStatus('Liquidity added!', 'success');
+                await refreshBalances();
+            } catch(e) {
+                showStatus('Failed: ' + e.message.slice(0, 60), 'error');
+            }
+        }
+
+        async function removeLiquidity() {
+            showStatus('Use Router to remove liquidity', 'info');
+        }
+
+        // Farm Functions
+        async function stake() {
+            if (!signer) return showStatus('Connect wallet first!', 'error');
+
+            try {
+                const amount = document.getElementById('stakeAmount').value;
+                if (!amount) return showStatus('Enter amount!', 'error');
+
+                showStatus('Staking...', 'info');
+
+                const lpToken = new ethers.Contract(CONFIG.pair, ERC20_ABI, signer);
+                const amountWei = ethers.parseEther(amount);
+                
+                const allowance = await lpToken.allowance(userAddress, CONFIG.farm);
+                if (allowance < amountWei) {
+                    const tx = await lpToken.approve(CONFIG.farm, amountWei);
+                    await tx.wait();
+                }
+
+                const farm = new ethers.Contract(CONFIG.farm, FARM_ABI, signer);
+                const tx = await farm.deposit(CONFIG.farmPid, amountWei);
+                await tx.wait();
+
+                showStatus('Staked!', 'success');
+                await refreshFarmData();
+            } catch(e) {
+                showStatus('Failed: ' + e.message.slice(0, 60), 'error');
+            }
+        }
+
+        async function unstake() {
+            if (!signer) return showStatus('Connect wallet first!', 'error');
+
+            try {
+                const amount = document.getElementById('stakeAmount').value;
+                if (!amount) return showStatus('Enter amount!', 'error');
+
+                showStatus('Unstaking...', 'info');
+
+                const farm = new ethers.Contract(CONFIG.farm, FARM_ABI, signer);
+                const tx = await farm.withdraw(CONFIG.farmPid, ethers.parseEther(amount));
+                await tx.wait();
+
+                showStatus('Unstaked!', 'success');
+                await refreshFarmData();
+            } catch(e) {
+                showStatus('Failed: ' + e.message.slice(0, 60), 'error');
+            }
+        }
+
+        async function claimRewards() {
+            if (!signer) return showStatus('Connect wallet first!', 'error');
+
+            try {
+                showStatus('Claiming rewards...', 'info');
+
+                const farm = new ethers.Contract(CONFIG.farm, FARM_ABI, signer);
+                const tx = await farm.withdraw(CONFIG.farmPid, 0);
+                await tx.wait();
+
+                showStatus('Rewards claimed!', 'success');
+                await refreshFarmData();
+            } catch(e) {
+                showStatus('Failed: ' + e.message.slice(0, 60), 'error');
+            }
+        }
+
+        // Bridge Functions
+        async function doBridge() {
+            if (!signer) return showStatus('Connect wallet first!', 'error');
+
+            try {
+                const amount = document.getElementById('bridgeAmount').value;
+                const destChain = document.getElementById('destChain').value;
+
+                if (!amount) return showStatus('Enter amount!', 'error');
+
+                showStatus('Bridging...', 'info');
+                showStatus('Use Multyra Bridge for automatic relay', 'info');
+            } catch(e) {
+                showStatus('Failed: ' + e.message.slice(0, 60), 'error');
+            }
+        }
+
+        // UI Functions
+        function showTab(tabId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.target.closest('.tab').classList.add('active');
+
+            if (tabId === 'farm') refreshFarmData();
+            if (tabId === 'liquidity' || tabId === 'tokens') refreshBalances();
+        }
+
+        function showStatus(message, type) {
+            const el = document.getElementById('status');
+            el.textContent = message;
+            el.className = 'status show ' + type;
+            
+            setTimeout(() => {
+                el.classList.remove('show');
+            }, 5000);
+        }
+
+        // Initialize on load
+        init();
+    </script>
 </body>
 </html>
