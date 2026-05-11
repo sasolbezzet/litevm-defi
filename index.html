@@ -25,7 +25,7 @@
             --gradient-glow: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
-            --text-muted: #64748b;
+            --text-muted: #8899aa;
             --border-color: rgba(148, 163, 184, 0.1);
             --spacing-xs: 4px;
             --spacing-sm: 8px;
@@ -71,6 +71,13 @@
         .tabs { display: flex; gap: var(--spacing-sm); padding: var(--spacing-lg) 0; overflow-x: auto; scrollbar-width: none; }
         .tabs::-webkit-scrollbar { display: none; }
         .tab { display: flex; align-items: center; gap: var(--spacing-sm); padding: 12px 24px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: var(--transition-base); }
+        .tab:hover, .tab:focus {
+            outline: 3px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+        .tab:focus:not(:focus-visible) { outline: none; }
+        .tab:focus-visible { outline: 3px solid var(--accent-primary); outline-offset: 2px; }
+
         .tab:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--accent-primary); }
         .tab.active { background: var(--gradient-primary); border-color: transparent; color: white; box-shadow: var(--shadow-glow); }
         .tab-icon { font-size: 18px; }
@@ -136,6 +143,18 @@
         .section.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         footer { padding: var(--spacing-xl) 0; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-muted); font-size: 13px; }
         
         @media (max-width: 768px) {
@@ -147,6 +166,15 @@
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-secondary); }
         ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 4px; }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -180,11 +208,11 @@
         <div id="status" class="status"></div>
 
         <nav class="tabs container">
-            <div class="tab active" onclick="showTab('swap')"><span class="tab-icon">💱</span><span>Swap</span></div>
-            <div class="tab" onclick="showTab('liquidity')"><span class="tab-icon">🌊</span><span>Liquidity</span></div>
-            <div class="tab" onclick="showTab('farm')"><span class="tab-icon">🌾</span><span>Farm</span></div>
-            <div class="tab" onclick="showTab('bridge')"><span class="tab-icon">🌉</span><span>Bridge</span></div>
-            <div class="tab" onclick="showTab('tokens')"><span class="tab-icon">🪙</span><span>Tokens</span></div>
+            <div class="tab active" tabindex="0" onkeydown="showTab('swap')"><span class="tab-icon">💱</span><span>Swap</span></div>
+            <div class="tab" tabindex="0" onkeydown="showTab('liquidity')"><span class="tab-icon">🌊</span><span>Liquidity</span></div>
+            <div class="tab" tabindex="0" onkeydown="showTab('farm')"><span class="tab-icon">🌾</span><span>Farm</span></div>
+            <div class="tab" tabindex="0" onkeydown="showTab('bridge')"><span class="tab-icon">🌉</span><span>Bridge</span></div>
+            <div class="tab" tabindex="0" onkeydown="showTab('tokens')"><span class="tab-icon">🪙</span><span>Tokens</span></div>
         </nav>
 
         <main class="container">
@@ -234,7 +262,7 @@
                                 <div class="stat-box"><div class="stat-value" id="swapSlippage">0.5%</div><div class="stat-label">Slippage</div></div>
                             </div>
 
-                            <button class="action-btn" onclick="doSwap()">Swap Now</button>
+                            <button class="action-btn" onclick="doSwap()" id="swapBtn">Swap Now</button>
                         </div>
                     </div>
 
@@ -281,7 +309,7 @@
                                 <input type="number" class="form-input" id="liqAmountB" placeholder="0.00">
                             </div>
 
-                            <button class="action-btn" onclick="addLiquidity()">Add Liquidity</button>
+                            <button class="action-btn" onclick="addLiquidity()" id="liqBtn">Add Liquidity</button>
                         </div>
 
                         <div class="card" style="margin-top: 16px;">
@@ -793,7 +821,8 @@
                 const amount = document.getElementById('swapFromAmount').value;
                 if (!amount || parseFloat(amount) <= 0) return showStatus('Enter amount!', 'error');
 
-                showStatus('Processing swap...', 'info');
+                showStatus('23F3 Processing swap...', 'info');
+                document.getElementById('swapBtn').disabled = true;
 
                 const amountWei = ethers.parseEther(amount);
                 const router = new ethers.Contract(CONTRACTS.router, ROUTER_ABI, signer);
@@ -835,10 +864,14 @@
 
                 await tx.wait();
                 showStatus('Swap completed!', 'success');
+                document.getElementById('swapBtn').disabled = false;
+                document.getElementById('swapBtn').textContent = 'Swap Now';
                 await refreshBalances();
             } catch(e) {
                 console.error('Swap error:', e);
                 showStatus('Swap failed: ' + e.message.slice(0, 80), 'error');
+                document.getElementById('swapBtn').disabled = false;
+                document.getElementById('swapBtn').textContent = 'Swap Now';
             }
         }
 
@@ -855,7 +888,8 @@
                 const amountB = document.getElementById('liqAmountB').value;
                 if (!amountA || !amountB) return showStatus('Enter amounts!', 'error');
 
-                showStatus('Adding liquidity...', 'info');
+                showStatus('23F3 Adding liquidity...', 'info');
+                document.getElementById('liqBtn').disabled = true;
 
                 // Approve both tokens
                 for (const token of [selectedTokens.liqTokenA, selectedTokens.liqTokenB]) {
@@ -881,10 +915,12 @@
                 );
                 await tx.wait();
                 showStatus('Liquidity added!', 'success');
+                document.getElementById('liqBtn').disabled = false;
                 await refreshBalances();
             } catch(e) {
                 console.error('Liq error:', e);
                 showStatus('Failed: ' + e.message.slice(0, 80), 'error');
+                document.getElementById('liqBtn').disabled = false;
             }
         }
 
@@ -917,6 +953,7 @@
             } catch(e) {
                 console.error('Stake error:', e);
                 showStatus('Failed: ' + e.message.slice(0, 80), 'error');
+                document.getElementById('liqBtn').disabled = false;
             }
         }
 
@@ -933,6 +970,7 @@
                 await refreshFarmData();
             } catch(e) {
                 showStatus('Failed: ' + e.message.slice(0, 80), 'error');
+                document.getElementById('liqBtn').disabled = false;
             }
         }
 
@@ -947,6 +985,7 @@
                 await refreshFarmData();
             } catch(e) {
                 showStatus('Failed: ' + e.message.slice(0, 80), 'error');
+                document.getElementById('liqBtn').disabled = false;
             }
         }
 
@@ -957,11 +996,13 @@
         }
 
         // UI
-        function showTab(tabId) {
+        function showTab(tabId, event) {
+            if (event && event.key && event.key !== "Enter" && event.key !== " ") return;
+            if (event) event.preventDefault();
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            event.target.closest('.tab').classList.add('active');
+            (event.target || event.currentTarget).closest('.tab').classList.add('active');
             if (tabId === 'farm') refreshFarmData();
             if (tabId === 'liquidity' || tabId === 'tokens') refreshBalances();
         }
