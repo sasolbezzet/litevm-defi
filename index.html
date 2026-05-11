@@ -867,12 +867,17 @@ const FARM_ABI = [
             statusEl.innerHTML = 'Processing...';
             
             try {
-                // Auto-detect current network and use appropriate bridge
+                // Use current network to determine bridge address (don't switch!)
                 let bridgeAddr = '0xfcA5CB59fDFC0Cb15Ca1035FeE204DC916F7c70f'; // LiteVM
                 const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                if (chainId === '0xaa36a7') { // Sepolia
+                let currentChain = parseInt(chainId, 16);
+                
+                // Determine which bridge to use based on CURRENT network
+                if (currentChain === 11155111) { // Sepolia
                     bridgeAddr = '0xb9Fb801A5D1491E70A886800982CB80cdf98A174'; // Sepolia
                 }
+                
+                console.log('Current chain:', currentChain, 'Bridge:', bridgeAddr);
                 const bridge = new ethers.Contract(bridgeAddr, BRIDGE_ABI, signer);
                 
                 if (token === '0x0000000000000000000000000000000000000000') {
@@ -885,7 +890,9 @@ const FARM_ABI = [
                     const tokenContract = new ethers.Contract(token, ERC20_ABI, signer);
                     const decimals = token === '0xA92408f6dFfEb31d9Edc009b082e0f71f24c4db9' || token === '0x809b462E49aABe96f1C98740EFb08E7E5D9D5479' ? 6 : 18;
                     await tokenContract.approve(bridgeAddr, decimals === 6 ? ethers.parseUnits(amount, 6) : ethers.parseEther(amount));
-                    const tx = await bridge.bridgeToken(token, ethers.parseEther(amount), destChain, recipient);
+                    const tx = const tokenDecimals = token === "0xA92408f6dFfEb31d9Edc009b082e0f71f24c4db9" || token === "0x809b462E49aABe96f1C98740EFb08E7E5D9D5479" ? 6 : 18;
+                    const tokenAmount = tokenDecimals === 6 ? ethers.parseUnits(amount, 6) : ethers.parseEther(amount);
+                    await bridge.lockToken(token, tokenAmount, destChain, recipient);
                     await tx.wait();
                     statusEl.innerHTML = '<span class="success">Bridge initiated!</span>';
                 }
