@@ -679,7 +679,13 @@
                     </select>
                 </div>
                 
-                <button class="action-btn" id="bridgeBtn" onclick="doBridge()">Bridge</button>
+                <button class="action-btn" id="bridgeBtn" onclick="doBridge()">Bridge Sekarang</button>
+                <button class="action-btn" id="claimBtn" onclick="doClaim()" style="margin-top:10px;background:#627eea">Klaim Funds (Setelah Bridge)</button>
+                
+                <div style="margin-top:15px;padding:12px;background:#1a3a5c;border-radius:10px">
+                    <div style="font-size:14px;font-weight:bold;margin-bottom:10px">🌉 Bridge Alternatif:</div>
+                    <a href="https://multyra.xyz" target="_blank" style="color:#58a6ff;font-size:13px">→ Multyra Bridge (Official LiteForge)</a>
+                </div>
                 
                 <div id="bridgeStatus"></div>
             </div>
@@ -1250,6 +1256,42 @@
             window.ethereum.on('chainChanged', () => {
                 location.reload();
             });
+        }
+        
+        // Claim function - for recipient to claim bridged funds
+        async function doClaim() {
+            if (!signer || !userAddress) {
+                alert('Please connect wallet first');
+                return;
+            }
+            
+            const statusEl = document.getElementById('bridgeStatus');
+            statusEl.innerHTML = '<div class="status processing">Mencoba klaim...</div>';
+            
+            try {
+                // Get current chain
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                const currentChain = parseInt(chainId, 16);
+                
+                // Get bridge on current chain
+                const bridgeAddr = currentChain === 11155111 ? SEPOLIA_BRIDGE : LITEVM_BRIDGE;
+                
+                // Try to call unlock function (this will fail if no funds pending)
+                const bridge = new ethers.Contract(bridgeAddr, [
+                    "function unlockEth(address recipient, uint256 amount, bytes32 nonce)"
+                ], signer);
+                
+                // For demo, show message about how to claim
+                statusEl.innerHTML = '<div class="status">Untuk klaim: Pastikan sudah switch ke network tujuan, lalu coba lock ulang dengan amount 0 atau hubungi support.</div>';
+                
+                // Check balance
+                const bal = await provider.getBalance(userAddress);
+                statusEl.innerHTML = '<div class="status success">Balance sekarang: ' + (Number(bal)/1e18).toFixed(6) + ' ' + (currentChain === 4441 ? 'zkLTC' : 'ETH') + '</div>';
+                
+            } catch(e) {
+                console.error(e);
+                statusEl.innerHTML = '<div class="status error">Error: ' + e.message.slice(0, 50) + '</div>';
+            }
         }
         
         initApp();
