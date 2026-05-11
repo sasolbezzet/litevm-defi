@@ -760,7 +760,7 @@
     </div>
     
     <script>
-        // Configuration
+
         const TOKENS = {
             "0x5b3a6c06be6719353c2b6059bAaB6b0Dae358052": { symbol: "TKNA", decimals: 18 },
             "0x8370CfDe29eF5b0565e27e0643583a4784325946": { symbol: "TKNB", decimals: 18 },
@@ -790,7 +790,8 @@
         const FARM_ABI = [
             "function deposit(uint256 _pid, uint256 _amount)",
             "function withdraw(uint256 _pid, uint256 _amount)",
-            "function userInfo(uint256, address) view returns (uint256, uint256)"
+            "function userInfo(uint256, address) view returns (uint256, uint256)",
+            "function totalDeposits() view returns (uint256)"
         ];
         
         const BRIDGE_ABI = [
@@ -798,7 +799,6 @@
             "function lockToken(address token, uint256 amount, uint256 destinationChain, address recipient)"
         ];
         
-        // Tab Functions
         function showTab(tabName, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -806,7 +806,6 @@
             if(el) el.classList.add('active');
         }
         
-        // Wallet Functions
         function openWalletModal() {
             document.getElementById('walletModal').style.display = 'flex';
         }
@@ -839,6 +838,7 @@
                 
                 await updateBalances();
                 await updateNetworkDisplay();
+                await updateFarmData();
                 
             } catch(e) {
                 console.error(e);
@@ -851,10 +851,9 @@
             try {
                 const chainId = await window.ethereum.request({ method: 'eth_chainId' });
                 const chainNum = parseInt(chainId, 16);
-                const chainDisplay = chainNum === 4441 ? 'LiteVM' : chainNum === 11155111 ? 'Sepolia' : 'Unknown';
+                const name = chainNum === 4441 ? 'LiteVM' : chainNum === 11155111 ? 'Sepolia' : 'Unknown';
                 document.getElementById('networkBadge').textContent = name;
                 
-                // Update chain buttons
                 document.getElementById('btnLiteVM').classList.toggle('active', chainNum === 4441);
                 document.getElementById('btnSepolia').classList.toggle('active', chainNum === 11155111);
             } catch(e) {}
@@ -864,37 +863,31 @@
             if (!userAddress || !provider) return;
             
             try {
-                // Native balance
-                const nativeBal = await provider.getBalance(userAddress);
                 const chainId = await window.ethereum?.request({ method: 'eth_chainId' });
                 const chainNum = chainId ? parseInt(chainId, 16) : 4441;
                 const symbol = chainNum === 4441 ? 'zkLTC' : 'ETH';
-                // Also update bridge native balance
-                const bridgeNativeEl = document.getElementById('bridgeNativeBalance');
-                if (bridgeNativeEl) {
-                    const balanceNum = Number(nativeBal / 1n) / 1e18;
-                    const displaySymbol = chainNum === 4441 ? 'zkLTC' : 'ETH';
-                    bridgeNativeEl.textContent = balanceNum.toFixed(6) + ' ' + displaySymbol;
-                }
                 
-                // Also update bridge balance with correct symbol based on network
+                const nativeBal = await provider.getBalance(userAddress);
                 const bridgeNativeEl = document.getElementById('bridgeNativeBalance');
                 if (bridgeNativeEl) {
                     const balanceNum = Number(nativeBal / 1n) / 1e18;
                     bridgeNativeEl.textContent = balanceNum.toFixed(6) + ' ' + symbol;
                 }
                 
-                // Token balances for swap
+                const fromToken = document.getElementById('fromToken')?.value;
+                const toToken = document.getElementById('toToken')?.value;
+                
                 for (const [addr, info] of Object.entries(TOKENS)) {
                     try {
                         const token = new ethers.Contract(addr, ERC20_ABI, provider);
                         const bal = await token.balanceOf(userAddress);
                         const balNum = Number(bal / 1n) / Math.pow(10, info.decimals);
-                        if (document.getElementById('fromToken').value === addr) {
-                            document.getElementById('fromBalance').textContent = 'Balance: ' + balNum.toFixed(2);
+                        
+                        if (fromToken === addr) {
+                            document.getElementById('fromBalance').textContent = 'Balance: ' + balNum.toFixed(4);
                         }
-                        if (document.getElementById('toToken').value === addr) {
-                            document.getElementById('toBalance').textContent = 'Balance: ' + balNum.toFixed(2);
+                        if (toToken === addr) {
+                            document.getElementById('toBalance').textContent = 'Balance: ' + balNum.toFixed(4);
                         }
                     } catch(e) {}
                 }
@@ -903,7 +896,32 @@
             }
         }
         
-        // Network Switch Functions
+        async function updateFarmData() {
+            if (!userAddress || !provider) return;
+            
+            try {
+                const farm = new ethers.Contract(FARM, FARM_ABI, provider);
+                
+                const [staked] = await farm.userInfo(0, userAddress);
+                const stakedNum = Number(staked / 1n) / 1e18;
+                
+                document.getElementById('farmStaked1').textContent = stakedNum.toFixed(4) + ' LP';
+                document.getElementById('farmStaked2').textContent = stakedNum.toFixed(4) + ' LP';
+                
+                try {
+                    const totalDeposits = await farm.totalDeposits();
+                    const tvlNum = Number(totalDeposits / 1n) / 1e18;
+                    document.getElementById('farmTVL1').textContent = '$' + tvlNum.toFixed(0);
+                    document.getElementById('farmTVL2').textContent = '$' + (tvlNum * 0.7).toFixed(0);
+                } catch(e) {
+                    document.getElementById('farmTVL1').textContent = '$0';
+                    document.getElementById('farmTVL2').textContent = '$0';
+                }
+            } catch(e) {
+                console.log('Farm data error:', e);
+            }
+        }
+        
         async function switchToLiteVM() {
             try {
                 await window.ethereum.request({
@@ -946,7 +964,6 @@
             updateNetworkDisplay();
         }
         
-        // Swap Functions
         function swapTokens() {
             const from = document.getElementById('fromToken').value;
             const to = document.getElementById('toToken').value;
@@ -983,11 +1000,9 @@
                 
                 const router = new ethers.Contract(ROUTER, ROUTER_ABI, signer);
                 
-                // Approve
                 const token = new ethers.Contract(fromToken, ERC20_ABI, signer);
                 await token.approve(ROUTER, amountIn);
                 
-                // Swap
                 const tx = await router.swapExactTokensForTokens(
                     amountIn, 0,
                     [fromToken, toToken],
@@ -996,7 +1011,7 @@
                 );
                 
                 await tx.wait();
-                statusEl.innerHTML = '<div class="status success">Swap Successful! 🎉</div>';
+                statusEl.innerHTML = '<div class="status success">Swap Successful!</div>';
                 await updateBalances();
                 
             } catch(e) {
@@ -1005,7 +1020,6 @@
             }
         }
         
-        // Liquidity Functions
         async function addLiquidity() {
             if (!signer) return;
             
@@ -1040,7 +1054,7 @@
                 );
                 
                 await tx.wait();
-                statusEl.innerHTML = '<div class="status success">Liquidity Added! 🎉</div>';
+                statusEl.innerHTML = '<div class="status success">Liquidity Added!</div>';
                 
             } catch(e) {
                 console.error(e);
@@ -1048,7 +1062,6 @@
             }
         }
         
-        // Bridge Functions
         const LITEVM_BRIDGE = "0xfcA5CB59fDFC0Cb15Ca1035FeE204DC916F7c70f";
         const SEPOLIA_BRIDGE = "0xb9Fb801A5D1491E70A886800982CB80cdf98A174";
         
@@ -1078,9 +1091,7 @@
                 const chainId = await window.ethereum.request({ method: 'eth_chainId' });
                 const currentChain = parseInt(chainId, 16);
                 
-                // Use current network's bridge
                 const bridgeAddr = currentChain === 11155111 ? SEPOLIA_BRIDGE : LITEVM_BRIDGE;
-                console.log('Current chain:', currentChain, 'Bridge:', bridgeAddr);
                 
                 const bridge = new ethers.Contract(bridgeAddr, BRIDGE_ABI, signer);
                 
@@ -1089,7 +1100,7 @@
                 });
                 
                 await tx.wait();
-                statusEl.innerHTML = '<div class="status success">Bridge Initiated! 🎉</div>';
+                statusEl.innerHTML = '<div class="status success">Bridge Initiated!</div>';
                 
             } catch(e) {
                 console.error(e);
@@ -1097,7 +1108,6 @@
             }
         }
         
-        // Farm Functions
         async function farmDeposit() {
             if (!signer || !userAddress) {
                 alert('Please connect wallet first');
@@ -1110,22 +1120,17 @@
             try {
                 const farm = new ethers.Contract(FARM, FARM_ABI, signer);
                 
-                // Get LP token for TKNA-USDC pair (pid 0)
                 const lpToken = "0x480377F7f118Bf048be5f7F5c9EBC67Cd50cb9Fd";
-                const amount = document.getElementById('farmDepositAmount')?.value || "1";
-                
-                const token = new ethers.Contract(lpToken, ERC20_ABI, signer);
-                const decimals = 18;
+                const amount = "1";
                 const amountIn = ethers.parseEther(amount);
                 
-                // Approve LP token
+                const token = new ethers.Contract(lpToken, ERC20_ABI, signer);
                 await token.approve(FARM, amountIn);
                 
-                // Deposit to farm (pid 0)
                 const tx = await farm.deposit(0, amountIn);
                 await tx.wait();
                 
-                statusEl.innerHTML = '<div class="status success">Deposited to Farm! 🎉</div>';
+                statusEl.innerHTML = '<div class="status success">Deposited to Farm!</div>';
                 await updateFarmBalances();
                 
             } catch(e) {
@@ -1146,14 +1151,13 @@
             try {
                 const farm = new ethers.Contract(FARM, FARM_ABI, signer);
                 
-                const amount = document.getElementById('farmWithdrawAmount')?.value || "1";
+                const amount = "1";
                 const amountIn = ethers.parseEther(amount);
                 
-                // Withdraw from farm (pid 0)
                 const tx = await farm.withdraw(0, amountIn);
                 await tx.wait();
                 
-                statusEl.innerHTML = '<div class="status success">Withdrawn from Farm! 🎉</div>';
+                statusEl.innerHTML = '<div class="status success">Withdrawn from Farm!</div>';
                 await updateFarmBalances();
                 
             } catch(e) {
@@ -1163,23 +1167,9 @@
         }
         
         async function updateFarmBalances() {
-            if (!userAddress || !provider) return;
-            
-            try {
-                const farm = new ethers.Contract(FARM, FARM_ABI, provider);
-                
-                // Get user info for pool 0
-                const [staked] = await farm.userInfo(0, userAddress);
-                const stakedNum = Number(staked / 1n) / 1e18;
-                
-                document.getElementById('farmStaked1').textContent = stakedNum.toFixed(4) + ' LP';
-                document.getElementById('farmStaked2').textContent = stakedNum.toFixed(4) + ' LP';
-            } catch(e) {
-                console.log('Farm balance error:', e);
-            }
+            await updateFarmData();
         }
         
-        // Auto-reconnect on page load
         async function initApp() {
             if (!window.ethereum) return;
             
@@ -1197,120 +1187,33 @@
                     
                     await updateBalances();
                     await updateNetworkDisplay();
-                    await updateFarmBalances();
+                    await updateFarmData();
                 }
             } catch(e) {
                 console.log('Auto-connect failed:', e);
             }
         }
         
-        // Fix balance detection for Sepolia
-        async function updateBalances() {
-            if (!userAddress || !provider) return;
-            
-            try {
-                // Get current chain to determine which bridge balance to show
-                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                const chainNum = parseInt(chainId, 16);
-                const symbol = chainNum === 4441 ? 'zkLTC' : 'ETH';
-                
-                // Native balance
-                const nativeBal = await provider.getBalance(userAddress);
-                document.getElementById('bridgeNativeBalance').textContent = 
-                    Number(nativeBal / 1n).toLocaleString(undefined, {maximumFractionDigits: 4}) + ' ' + symbol;
-                
-                // Token balances
-                const fromToken = document.getElementById('fromToken')?.value;
-                const toToken = document.getElementById('toToken')?.value;
-                
-                for (const [addr, info] of Object.entries(TOKENS)) {
-                    try {
-                        const token = new ethers.Contract(addr, ERC20_ABI, provider);
-                        const bal = await token.balanceOf(userAddress);
-                        const balNum = Number(bal / 1n) / Math.pow(10, info.decimals);
-                        
-                        if (fromToken === addr) {
-                            document.getElementById('fromBalance').textContent = 'Balance: ' + balNum.toFixed(4);
-                        }
-                        if (toToken === addr) {
-                            document.getElementById('toBalance').textContent = 'Balance: ' + balNum.toFixed(4);
-                        }
-                    } catch(e) {
-                        // Token might not exist on this chain
-                    }
-                }
-            } catch(e) {
-                console.log('Balance error:', e);
-            }
-        }
-        
-        // Listen for account/network changes
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', async (accounts) => {
                 if (accounts.length === 0) {
-                    // Disconnected
                     userAddress = null;
                     document.getElementById('connectBtn').textContent = 'Connect Wallet';
                     document.getElementById('swapBtn').disabled = true;
                     document.getElementById('swapBtn').textContent = 'Connect Wallet First';
                 } else {
-                    // Reconnected
                     location.reload();
                 }
             });
             
-            window.ethereum.on('chainChanged', (chainId) => {
+            window.ethereum.on('chainChanged', () => {
                 location.reload();
             });
         }
         
-        // Update farm data
-        async function updateFarmData() {
-            if (!provider) return;
-            try {
-                const farm = new ethers.Contract(FARM, [
-                    "function totalDeposits() view returns (uint256)"
-                ], provider);
-                
-                try {
-                    const totalDeposits = await farm.totalDeposits();
-                    const tvlNum = Number(totalDeposits / 1n) / 1e18;
-                    document.getElementById('farmTVL1').textContent = '$' + tvlNum.toFixed(0);
-                    document.getElementById('farmTVL2').textContent = '$' + (tvlNum * 0.7).toFixed(0);
-                } catch(e) {
-                    document.getElementById('farmTVL1').textContent = '$0';
-                    document.getElementById('farmTVL2').textContent = '$0';
-                }
-            } catch(e) {
-                console.log('Farm data error:', e);
-            }
-        }
-        
-// Initialize on load
-        initApp().then(() => updateFarmData());
+        initApp();
     </script>
-</body>
-</html>
- '$' + tvlNum.toFixed(0);
-                    document.getElementById('farmTVL2').textContent = '
-        
-        // Initialize on load
-        initApp().then(() => updateFarmData());
-    </script>
-</body>
-</html>
- + (tvlNum * 0.7).toFixed(0);
-                } catch(e) {
-                    document.getElementById('farmTVL1').textContent = '$0';
-                    document.getElementById('farmTVL2').textContent = '$0';
-                }
-            } catch(e) {
-                console.log('Farm data error:', e);
-            }
-        }
-        
-        // Initialize on load
-        initApp().then(() => updateFarmData());
-    </script>
+
+</script>
 </body>
 </html>
