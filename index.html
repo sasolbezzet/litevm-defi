@@ -1094,18 +1094,92 @@
             // Farm withdraw logic here
         }
         
-        // Listen for account changes
+        // Auto-reconnect on page load
+        async function initApp() {
+            if (!window.ethereum) return;
+            
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                if (accounts.length > 0) {
+                    userAddress = accounts[0];
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    signer = await provider.getSigner();
+                    
+                    document.getElementById('connectBtn').textContent = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+                    document.getElementById('swapBtn').textContent = 'Swap';
+                    document.getElementById('swapBtn').disabled = false;
+                    document.getElementById('addLiquidityBtn').disabled = false;
+                    
+                    await updateBalances();
+                    await updateNetworkDisplay();
+                }
+            } catch(e) {
+                console.log('Auto-connect failed:', e);
+            }
+        }
+        
+        // Fix balance detection for Sepolia
+        async function updateBalances() {
+            if (!userAddress || !provider) return;
+            
+            try {
+                // Get current chain to determine which bridge balance to show
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                const chainNum = parseInt(chainId, 16);
+                const symbol = chainNum === 4441 ? 'zkLTC' : 'ETH';
+                
+                // Native balance
+                const nativeBal = await provider.getBalance(userAddress);
+                document.getElementById('bridgeNativeBalance').textContent = 
+                    Number(nativeBal / 1n).toLocaleString(undefined, {maximumFractionDigits: 4}) + ' ' + symbol;
+                
+                // Token balances
+                const fromToken = document.getElementById('fromToken')?.value;
+                const toToken = document.getElementById('toToken')?.value;
+                
+                for (const [addr, info] of Object.entries(TOKENS)) {
+                    try {
+                        const token = new ethers.Contract(addr, ERC20_ABI, provider);
+                        const bal = await token.balanceOf(userAddress);
+                        const balNum = Number(bal / 1n) / Math.pow(10, info.decimals);
+                        
+                        if (fromToken === addr) {
+                            document.getElementById('fromBalance').textContent = 'Balance: ' + balNum.toFixed(4);
+                        }
+                        if (toToken === addr) {
+                            document.getElementById('toBalance').textContent = 'Balance: ' + balNum.toFixed(4);
+                        }
+                    } catch(e) {
+                        // Token might not exist on this chain
+                    }
+                }
+            } catch(e) {
+                console.log('Balance error:', e);
+            }
+        }
+        
+        // Listen for account/network changes
         if (window.ethereum) {
-            window.ethereum.on('accountsChanged', (accounts) => {
+            window.ethereum.on('accountsChanged', async (accounts) => {
                 if (accounts.length === 0) {
+                    // Disconnected
+                    userAddress = null;
+                    document.getElementById('connectBtn').textContent = 'Connect Wallet';
+                    document.getElementById('swapBtn').disabled = true;
+                    document.getElementById('swapBtn').textContent = 'Connect Wallet First';
+                } else {
+                    // Reconnected
                     location.reload();
                 }
             });
             
-            window.ethereum.on('chainChanged', () => {
+            window.ethereum.on('chainChanged', (chainId) => {
                 location.reload();
             });
         }
+        
+        // Initialize on load
+        initApp();
     </script>
 </body>
 </html>
