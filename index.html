@@ -851,7 +851,7 @@
             try {
                 const chainId = await window.ethereum.request({ method: 'eth_chainId' });
                 const chainNum = parseInt(chainId, 16);
-                const name = chainNum === 4441 ? 'LiteVM' : chainNum === 11155111 ? 'Sepolia' : 'Unknown';
+                const chainDisplay = chainNum === 4441 ? 'LiteVM' : chainNum === 11155111 ? 'Sepolia' : 'Unknown';
                 document.getElementById('networkBadge').textContent = name;
                 
                 // Update chain buttons
