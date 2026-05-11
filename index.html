@@ -1275,9 +1275,18 @@
                 try {
                     const totalDeposits = await farm.totalDeposits();
                     const tvlNum = Number(totalDeposits / 1n) / 1e18;
-                    document.getElementById('farmTVL1').textContent = '
+                    document.getElementById('farmTVL1').textContent = '$' + tvlNum.toFixed(0);
+                    document.getElementById('farmTVL2').textContent = '$' + (tvlNum * 0.7).toFixed(0);
+                } catch(e) {
+                    document.getElementById('farmTVL1').textContent = '$0';
+                    document.getElementById('farmTVL2').textContent = '$0';
+                }
+            } catch(e) {
+                console.log('Farm data error:', e);
+            }
+        }
         
-        // Initialize on load
+// Initialize on load
         initApp().then(() => updateFarmData());
     </script>
 </body>
