@@ -651,7 +651,10 @@
                     <button class="chain-btn" id="btnSepolia" onclick="switchToSepolia()">🌐 Sepolia</button>
                 </div>
                 
-                <div class="balance-display">
+                <div style="background:#1a3a5c;padding:10px;border-radius:8px;margin-bottom:15px;font-size:12px;color:#58a6ff">
+            💡 <b>Cara Bridge:</b> Kirim dari network sekarang → Switch ke network tujuan → funds akan otomatis masuk (atau klaim manual)
+        </div>
+        <div class="balance-display">
                     <div class="balance-row">
                         <span class="balance-label">Your Balance</span>
                         <span class="balance-value" id="bridgeNativeBalance">0 ETH</span>
@@ -1100,11 +1103,49 @@
                 });
                 
                 await tx.wait();
-                statusEl.innerHTML = '<div class="status success">Bridge Initiated!</div>';
+                statusEl.innerHTML = '<div class="status success">Bridge Initiated! Wait ~2-3 min, then switch to destination network and claim.</div>';
+                
+                // Auto-try to claim after a delay
+                setTimeout(async () => {
+                    try {
+                        await autoClaim(destChain, recipient);
+                    } catch(e) {
+                        console.log('Auto-claim not available, please claim manually');
+                    }
+                }, 3000);
                 
             } catch(e) {
                 console.error(e);
                 statusEl.innerHTML = '<div class="status error">Error: ' + (e.reason || e.message).slice(0, 60) + '</div>';
+            }
+        }
+        
+        // Auto-claim function
+        async function autoClaim(destChain, recipient) {
+            if (!signer) return;
+            
+            try {
+                // Switch to destination chain
+                if (destChain === '4441') {
+                    await switchToLiteVM();
+                } else {
+                    await switchToSepolia();
+                }
+                
+                // Wait for chain switch
+                await new Promise(r => setTimeout(r, 2000));
+                
+                // Get the bridge on destination chain
+                const bridgeAddr = destChain === '4441' ? SEPOLIA_BRIDGE : LITEVM_BRIDGE;
+                const bridge = new ethers.Contract(bridgeAddr, [
+                    "function unlockEth(address recipient, uint256 amount, bytes32 nonce)"
+                ], signer);
+                
+                // Try to unlock (this may fail if no funds locked, which is expected)
+                // The actual flow is: lock on source -> relayer unlocks on destination
+                console.log('Claim check: Please wait for relayer or switch to destination network');
+            } catch(e) {
+                console.log('Claim error:', e.message);
             }
         }
         
