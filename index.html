@@ -866,7 +866,11 @@
             try {
                 // Native balance
                 const nativeBal = await provider.getBalance(userAddress);
-                document.getElementById('bridgeNativeBalance').textContent = Number(nativeBal / 1n).toLocaleString(undefined, {maximumFractionDigits: 4}) + ' ETH';
+                const chainId = await window.ethereum?.request({ method: 'eth_chainId' });
+                const chainNum = chainId ? parseInt(chainId, 16) : 4441;
+                const symbol = chainNum === 4441 ? 'zkLTC' : 'ETH';
+                document.getElementById('bridgeNativeBalance').textContent = 
+                    Number(nativeBal / 1n).toLocaleString(undefined, {maximumFractionDigits: 4}) + ' ' + symbol;
                 
                 // Token balances for swap
                 for (const [addr, info] of Object.entries(TOKENS)) {
@@ -1083,15 +1087,84 @@
         
         // Farm Functions
         async function farmDeposit() {
-            if (!signer) return;
-            document.getElementById('farmStatus').innerHTML = '<div class="status processing">Processing...</div>';
-            // Farm deposit logic here
+            if (!signer || !userAddress) {
+                alert('Please connect wallet first');
+                return;
+            }
+            
+            const statusEl = document.getElementById('farmStatus');
+            statusEl.innerHTML = '<div class="status processing">Processing...</div>';
+            
+            try {
+                const farm = new ethers.Contract(FARM, FARM_ABI, signer);
+                
+                // Get LP token for TKNA-USDC pair (pid 0)
+                const lpToken = "0x480377F7f118Bf048be5f7F5c9EBC67Cd50cb9Fd";
+                const amount = document.getElementById('farmDepositAmount')?.value || "1";
+                
+                const token = new ethers.Contract(lpToken, ERC20_ABI, signer);
+                const decimals = 18;
+                const amountIn = ethers.parseEther(amount);
+                
+                // Approve LP token
+                await token.approve(FARM, amountIn);
+                
+                // Deposit to farm (pid 0)
+                const tx = await farm.deposit(0, amountIn);
+                await tx.wait();
+                
+                statusEl.innerHTML = '<div class="status success">Deposited to Farm! 🎉</div>';
+                await updateFarmBalances();
+                
+            } catch(e) {
+                console.error(e);
+                statusEl.innerHTML = '<div class="status error">Error: ' + (e.reason || e.message).slice(0, 50) + '</div>';
+            }
         }
         
         async function farmWithdraw() {
-            if (!signer) return;
-            document.getElementById('farmStatus').innerHTML = '<div class="status processing">Processing...</div>';
-            // Farm withdraw logic here
+            if (!signer || !userAddress) {
+                alert('Please connect wallet first');
+                return;
+            }
+            
+            const statusEl = document.getElementById('farmStatus');
+            statusEl.innerHTML = '<div class="status processing">Processing...</div>';
+            
+            try {
+                const farm = new ethers.Contract(FARM, FARM_ABI, signer);
+                
+                const amount = document.getElementById('farmWithdrawAmount')?.value || "1";
+                const amountIn = ethers.parseEther(amount);
+                
+                // Withdraw from farm (pid 0)
+                const tx = await farm.withdraw(0, amountIn);
+                await tx.wait();
+                
+                statusEl.innerHTML = '<div class="status success">Withdrawn from Farm! 🎉</div>';
+                await updateFarmBalances();
+                
+            } catch(e) {
+                console.error(e);
+                statusEl.innerHTML = '<div class="status error">Error: ' + (e.reason || e.message).slice(0, 50) + '</div>';
+            }
+        }
+        
+        async function updateFarmBalances() {
+            if (!userAddress || !provider) return;
+            
+            try {
+                const farm = new ethers.Contract(FARM, FARM_ABI, provider);
+                
+                // Get user info for pool 0
+                const [staked] = await farm.userInfo(0, userAddress);
+                const stakedNum = Number(staked / 1n) / 1e18;
+                
+                document.getElementById('farmStaked1').textContent = stakedNum.toFixed(4) + ' LP';
+                document.getElementById('farmStaked2').textContent = stakedNum.toFixed(4) + ' LP';
+            } catch(e) {
+                console.log('Farm balance error:', e);
+            }
         }
         
         // Auto-reconnect on page load
@@ -1112,6 +1185,7 @@
                     
                     await updateBalances();
                     await updateNetworkDisplay();
+                    await updateFarmBalances();
                 }
             } catch(e) {
                 console.log('Auto-connect failed:', e);
