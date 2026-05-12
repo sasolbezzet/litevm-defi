@@ -841,7 +841,7 @@
                     // Approve first
                     const token = new ethers.Contract(selectedTokens.swapFrom.address, ERC20_ABI, signer);
                     const allowance = await token.allowance(userAddress, CONTRACTS.router);
-                    if (allowder < amountWei) {
+                    if (allowance < amountWei) {
                         const approveTx = await token.approve(CONTRACTS.router, amountWei);
                         await approveTx.wait();
                     }
@@ -854,7 +854,7 @@
                     // Approve first
                     const token = new ethers.Contract(selectedTokens.swapFrom.address, ERC20_ABI, signer);
                     const allowance = await token.allowance(userAddress, CONTRACTS.router);
-                    if (allowder < amountWei) {
+                    if (allowance < amountWei) {
                         const approveTx = await token.approve(CONTRACTS.router, amountWei);
                         await approveTx.wait();
                     }
@@ -897,7 +897,7 @@
                     const contract = new ethers.Contract(token.address, ERC20_ABI, signer);
                     const amount = token === selectedTokens.liqTokenA ? amountA : amountB;
                     const allowance = await contract.allowance(userAddress, CONTRACTS.router);
-                    if (allowder < ethers.parseEther(amount)) {
+                    if (allowance < ethers.parseEther(amount)) {
                         const tx = await contract.approve(CONTRACTS.router, ethers.parseEther(amount));
                         await tx.wait();
                     }
@@ -940,7 +940,7 @@
                 const amountWei = ethers.parseEther(amount);
                 
                 const allowance = await lpToken.allowance(userAddress, CONTRACTS.farm);
-                if (allowder < amountWei) {
+                if (allowance < amountWei) {
                     const tx = await lpToken.approve(CONTRACTS.farm, amountWei);
                     await tx.wait();
                 }
